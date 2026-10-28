@@ -4,7 +4,7 @@ import json
 app = Flask(__name__)
 
 # ============================================================
-# ۱. داده‌های جدول مندلیف (۱۱۸ عنصر)
+# ۱. عناصر (۱۱۸) — بدون تغییر
 # ============================================================
 ELEMENTS_STR = """
 1|H|هیدروژن|1.008|نافلز|1|1|s|1s¹|2.20|53|13.6|-259.1|0.00009|هنری کاوندیش|1766|سوخت پیل|تولید آمونیاک|پالایش نفت|سبک‌ترین و فراوان‌ترین عنصر کیهان.
@@ -141,126 +141,66 @@ for line in ELEMENTS_STR.strip().split('\n'):
             })
         except: pass
 
-# داده تکمیلی عناصر: ایزوتوپ | ریشه‌شناسی | محل | قیمت | کمیابی (۱-۱۰)
 ELEMENT_EXTRA = {
-    "H":"H-1(99.98%)، H-2(0.015%)، H-3(12.3y)|از یونانی hydro+genes|جهان، خورشید|~۲۵$/kg|۸",
-    "He":"He-3(0.0001%)، He-4(99.9999%)|از یونانی helios|آمریکا، قطر|~۲۴$/kg|۷",
-    "Li":"Li-6(7.5%)، Li-7(92.5%)|از یونانی lithos|شیلی، استرالیا|~۸۵$/kg|۵",
-    "Be":"Be-9(100%)|از beryl|آمریکا، چین|~۸۵۰$/kg|۷",
-    "B":"B-10(20%)، B-11(80%)|از borax|ترکیه، آمریکا|~۵$/kg|۳",
-    "C":"C-12(98.9%)، C-13(1.1%)|از لاتین carbo|جهان|متغیر|۱",
-    "N":"N-14(99.6%)، N-15(0.4%)|از یونانی nitron+genes|جو زمین|~۰.۵$/kg|۱",
-    "O":"O-16(99.76%)|از یونانی oxys+genes|پوسته و جو|~۳$/kg|۱",
-    "F":"F-19(100%)|از لاتین fluere|چین، مکزیک|~۲$/kg|۴",
-    "Ne":"Ne-20(90.5%)|از یونانی neos|جو زمین|~۲۴۰$/kg|۸",
-    "Na":"Na-23(100%)|از لاتین natrium|دریا|~۳$/kg|۱",
-    "Mg":"Mg-24(79%)|از یونانی magnesia|چین، روسیه|~۳$/kg|۲",
-    "Al":"Al-27(100%)|از لاتین alumen|گینه، استرالیا|~۲$/kg|۱",
-    "Si":"Si-28(92%)|از لاتین silex|جهان|~۲$/kg|۱",
-    "P":"P-31(100%)|از یونانی phosphoros|مراکش، چین|~۳$/kg|۴",
-    "S":"S-32(95%)|از لاتین sulphur|اندونزی، کانادا|~۰.۱$/kg|۳",
-    "Cl":"Cl-35(75%)، Cl-37(25%)|از یونانی chloros|دریا|~۰.۲$/kg|۱",
-    "Ar":"Ar-40(99.6%)|از یونانی argos|جو زمین|~۵۰$/kg|۷",
-    "K":"K-39(93%)، K-40(0.01%)|از لاتین kalium|کانادا، روسیه|~۱۲$/kg|۳",
-    "Ca":"Ca-40(97%)|از لاتین calx|جهان|~۲$/kg|۲",
-    "Sc":"Sc-45(100%)|از Scandia|چین، روسیه|~۳۵۰۰$/kg|۸",
-    "Ti":"Ti-48(74%)|از تیتان‌ها|استرالیا، آفریقای جنوبی|~۱۱$/kg|۴",
-    "V":"V-51(99.75%)|از Vanadis|چین، آفریقای جنوبی|~۳۰$/kg|۶",
-    "Cr":"Cr-52(84%)|از یونانی chroma|آفریقای جنوبی|~۱۰$/kg|۴",
-    "Mn":"Mn-55(100%)|از لاتین magnes|آفریقای جنوبی، استرالیا|~۲$/kg|۴",
-    "Fe":"Fe-56(92%)|از لاتین ferrum|استرالیا، برزیل|~۰.۱$/kg|۱",
-    "Co":"Co-59(100%)|از آلمانی kobold|کنگو، چین|~۳۳$/kg|۶",
-    "Ni":"Ni-58(68%)|از آلمانی kupfernickel|اندونزی، فیلیپین|~۱۶$/kg|۴",
-    "Cu":"Cu-63(69%)، Cu-65(31%)|از لاتین cuprum|شیلی، پرو|~۹$/kg|۳",
-    "Zn":"Zn-64(49%)|از آلمانی zink|چین، پرو|~۳$/kg|۳",
-    "Ga":"Ga-69(60%)|از Gallia|چین، آلمان|~۲۰۰$/kg|۷",
-    "Ge":"Ge-74(36%)|از Germania|چین، روسیه|~۱۲۰۰$/kg|۸",
-    "As":"As-75(100%)|از یونانی arsenikon|چین، شیلی|~۲$/kg|۵",
-    "Se":"Se-80(50%)|از یونانی selene|ژاپن، آلمان|~۵۵$/kg|۶",
-    "Br":"Br-79(51%)|از یونانی bromos|اسرائیل، اردن|~۵$/kg|۴",
-    "Kr":"Kr-84(57%)|از یونانی kryptos|جو زمین|~۲۹۰$/kg|۸",
-    "Rb":"Rb-85(72%)|از لاتین rubidus|کانادا، نامیبیا|~۱۵۵۰۰$/kg|۸",
-    "Sr":"Sr-88(83%)|از Strontian|اسپانیا، مکزیک|~۷$/kg|۴",
-    "Y":"Y-89(100%)|از Ytterby|چین، استرالیا|~۳۰$/kg|۶",
-    "Zr":"Zr-90(51%)|از فارسی zargun|استرالیا، آفریقای جنوبی|~۳۵$/kg|۵",
-    "Nb":"Nb-93(100%)|از Niobe|برزیل، کانادا|~۸۵$/kg|۶",
-    "Mo":"Mo-98(24%)|از یونانی molybdos|چین، آمریکا|~۴۰$/kg|۵",
-    "Tc":"Tc-99(2.1M y)|از یونانی technetos|مصنوعی|~۶۰M$/kg|۱۰",
-    "Ru":"Ru-102(31%)|از Ruthenia|روسیه، آفریقای جنوبی|~۱۵۰۰۰$/kg|۹",
-    "Rh":"Rh-103(100%)|از یونانی rhodon|آفریقای جنوبی|~۱۵۰M$/kg|۱۰",
-    "Pd":"Pd-106(27%)|از سیارک Pallas|روسیه، کانادا|~۵۰M$/kg|۹",
-    "Ag":"Ag-107(51%)|از لاتین argentum|مکزیک، پرو|~۹۰۰$/kg|۷",
-    "Cd":"Cd-114(28%)|از لاتین cadmia|چین، کره|~۳$/kg|۵",
-    "In":"In-115(95%)|از رنگ نیلی|چین، کره|~۲۰۰$/kg|۷",
-    "Sn":"Sn-120(32%)|از لاتین stannum|چین، اندونزی|~۲۵$/kg|۴",
-    "Sb":"Sb-121(57%)|از یونانی anti+monos|چین، روسیه|~۶$/kg|۵",
-    "Te":"Te-130(34%)|از لاتین tellus|چین، ژاپن|~۷۵$/kg|۷",
-    "I":"I-127(100%)|از یونانی iodes|شیلی، ژاپن|~۳۵$/kg|۵",
-    "Xe":"Xe-132(27%)|از یونانی xenon|جو زمین|~۱۸۰۰$/kg|۸",
-    "Cs":"Cs-133(100%)|از لاتین caesius|کانادا، زیمبابوه|~۶۲۰۰۰$/kg|۹",
-    "Ba":"Ba-138(72%)|از یونانی barys|چین، هند|~۰.۵$/kg|۴",
-    "La":"La-139(99.9%)|از یونانی lanthanein|چین، آمریکا|~۵$/kg|۵",
-    "Ce":"Ce-140(88%)|از سیارک Ceres|چین، آمریکا|~۵$/kg|۵",
-    "Pr":"Pr-141(100%)|از prasios+didymos|چین، آمریکا|~۱۰۰$/kg|۶",
-    "Nd":"Nd-142(27%)|از neos+didymos|چین، آمریکا|~۶۰$/kg|۶",
-    "Pm":"Pm-145(17.7y)|از Prometheus|مصنوعی|~۵۰۰M$/kg|۱۰",
-    "Sm":"Sm-152(27%)|از samarskite|چین، آمریکا|~۳$/kg|۵",
-    "Eu":"Eu-153(52%)|از اروپا|چین، روسیه|~۳۰$/kg|۷",
-    "Gd":"Gd-158(25%)|از شیمیدان گادولین|چین، آمریکا|~۳۰$/kg|۶",
-    "Tb":"Tb-159(100%)|از Ytterby|چین، آمریکا|~۹۰۰$/kg|۸",
-    "Dy":"Dy-164(28%)|از dysprositos|چین، استرالیا|~۳۰۰$/kg|۷",
-    "Ho":"Ho-165(100%)|از Holmia|چین، سریلانکا|~۶۰$/kg|۷",
-    "Er":"Er-166(34%)|از Ytterby|چین، آمریکا|~۳۰$/kg|۶",
-    "Tm":"Tm-169(100%)|از Thule|چین، روسیه|~۵۰$/kg|۸",
-    "Yb":"Yb-174(32%)|از Ytterby|چین، آمریکا|~۲۰$/kg|۶",
-    "Lu":"Lu-175(97%)|از Lutetia|چین، استرالیا|~۹۰۰$/kg|۸",
-    "Hf":"Hf-180(35%)|از Hafnia|استرالیا، آفریقای جنوبی|~۹۰۰$/kg|۷",
-    "Ta":"Ta-181(100%)|از Tantalus|کنگو، برزیل|~۱۵۰$/kg|۷",
-    "W":"W-184(31%)|از tung sten|چین، روسیه|~۳۵$/kg|۵",
-    "Re":"Re-187(63%)|از Rhenus|شیلی، آمریکا|~۴۰۰۰$/kg|۹",
-    "Os":"Os-192(41%)|از یونانی osme|روسیه، آمریکای جنوبی|~۱۲۰۰۰$/kg|۹",
-    "Ir":"Ir-193(63%)|از لاتین iris|آفریقای جنوبی|~۱۵۰M$/kg|۱۰",
-    "Pt":"Pt-195(34%)|از platina|آفریقای جنوبی|~۳۲M$/kg|۹",
-    "Au":"Au-197(100%)|از aurum|چین، استرالیا|~۶۵M$/kg|۱۰",
-    "Hg":"Hg-202(30%)|از Mercury|اسپانیا، چین|~۳۰$/kg|۶",
-    "Tl":"Tl-205(70%)|از thallos|چین، قزاقستان|~۶۰۰۰$/kg|۹",
-    "Pb":"Pb-208(52%)|از plumbum|چین، استرالیا|~۲$/kg|۴",
-    "Bi":"Bi-209(100%)|از weisse masse|چین، مکزیک|~۱۰$/kg|۶",
-    "Po":"Po-209(102y)|از لهستان|مصنوعی|~۵۰M$/kg|۱۰",
-    "At":"At-210(8.1h)|از astatos|مصنوعی|N/A|۱۰",
-    "Rn":"Rn-222(3.8d)|از radium|طبیعی|N/A|۸",
-    "Fr":"Fr-223(22m)|از فرانسه|مصنوعی|N/A|۱۰",
-    "Ra":"Ra-226(1600y)|از radius|کنگو|N/A|۱۰",
-    "Ac":"Ac-227(21.8y)|از aktis|مصنوعی|N/A|۱۰",
-    "Th":"Th-232(14Gy)|از Thor|هند، برزیل|~۳۰۰$/kg|۷",
-    "Pa":"Pa-231(32.8Ky)|از protactinium|مصنوعی|N/A|۱۰",
-    "U":"U-238(99.3%)|از Uranus|قزاقستان، کانادا|~۱۰۰$/kg|۷",
-    "Np":"Np-237(2.1My)|از Neptune|مصنوعی|N/A|۱۰",
-    "Pu":"Pu-239(24Ky)|از Pluto|مصنوعی|N/A|۱۰",
-    "Am":"Am-243(7370y)|از America|مصنوعی|N/A|۱۰",
-    "Cm":"Cm-247(15.6My)|از کوری‌ها|مصنوعی|N/A|۱۰",
-    "Bk":"Bk-247(1380y)|از برکلی|مصنوعی|N/A|۱۰",
-    "Cf":"Cf-251(898y)|از کالیفرنیا|مصنوعی|N/A|۱۰",
-    "Es":"Es-252(471.7d)|از اینشتین|مصنوعی|N/A|۱۰",
-    "Fm":"Fm-257(100.5d)|از فرمی|مصنوعی|N/A|۱۰",
-    "Md":"Md-258(51.5d)|از مندلیف|مصنوعی|N/A|۱۰",
-    "No":"No-259(58m)|از نوبل|مصنوعی|N/A|۱۰",
-    "Lr":"Lr-266(11h)|از لارنس|مصنوعی|N/A|۱۰",
-    "Rf":"Rf-267(1.3h)|از رادرفورد|مصنوعی|N/A|۱۰",
-    "Db":"Db-268(28h)|از دوبنا|مصنوعی|N/A|۱۰",
-    "Sg":"Sg-269(3.1m)|از سیبورگ|مصنوعی|N/A|۱۰",
-    "Bh":"Bh-270(61s)|از بور|مصنوعی|N/A|۱۰",
-    "Hs":"Hs-269(9.7s)|از هس|مصنوعی|N/A|۱۰",
-    "Mt":"Mt-278(4.5s)|از مایتنر|مصنوعی|N/A|۱۰",
-    "Ds":"Ds-281(14s)|از دارمشتات|مصنوعی|N/A|۱۰",
-    "Rg":"Rg-282(1.7m)|از رونتگن|مصنوعی|N/A|۱۰",
-    "Cn":"Cn-285(29s)|از کوپرنیک|مصنوعی|N/A|۱۰",
-    "Nh":"Nh-286(19.6s)|از ژاپن|مصنوعی|N/A|۱۰",
-    "Fl":"Fl-289(1.9s)|از فلروف|مصنوعی|N/A|۱۰",
-    "Mc":"Mc-290(650ms)|از مسکو|مصنوعی|N/A|۱۰",
-    "Lv":"Lv-293(57ms)|از لیورمور|مصنوعی|N/A|۱۰",
-    "Ts":"Ts-294(51ms)|از تنسی|مصنوعی|N/A|۱۰",
-    "Og":"Og-294(700µs)|از اوگانسسون|مصنوعی|N/A|۱۰",
+    "H":"H-1(99.98%)|از یونانی hydro+genes|جهان|~۲۵$/kg|۸","He":"He-4|از helios|آمریکا|~۲۴$/kg|۷",
+    "Li":"Li-6,7|از lithos|شیلی|~۸۵$/kg|۵","Be":"Be-9|از beryl|آمریکا|~۸۵۰$/kg|۷",
+    "B":"B-10,11|از borax|ترکیه|~۵$/kg|۳","C":"C-12,13|از carbo|جهان|متغیر|۱",
+    "N":"N-14,15|nitron+genes|جو|~۰.۵$/kg|۱","O":"O-16|oxys+genes|پوسته|~۳$/kg|۱",
+    "F":"F-19|fluere|چین|~۲$/kg|۴","Ne":"Ne-20|neos|جو|~۲۴۰$/kg|۸",
+    "Na":"Na-23|natrium|دریا|~۳$/kg|۱","Mg":"Mg-24|magnesia|چین|~۳$/kg|۲",
+    "Al":"Al-27|alumen|گینه|~۲$/kg|۱","Si":"Si-28|silex|جهان|~۲$/kg|۱",
+    "P":"P-31|phosphoros|مراکش|~۳$/kg|۴","S":"S-32|sulphur|اندونزی|~۰.۱$/kg|۳",
+    "Cl":"Cl-35,37|chloros|دریا|~۰.۲$/kg|۱","Ar":"Ar-40|argos|جو|~۵۰$/kg|۷",
+    "K":"K-39,40|kalium|کانادا|~۱۲$/kg|۳","Ca":"Ca-40|calx|جهان|~۲$/kg|۲",
+    "Sc":"Sc-45|Scandia|چین|~۳۵۰۰$/kg|۸","Ti":"Ti-48|تیتان|استرالیا|~۱۱$/kg|۴",
+    "V":"V-51|Vanadis|چین|~۳۰$/kg|۶","Cr":"Cr-52|chroma|آفریقای جنوبی|~۱۰$/kg|۴",
+    "Mn":"Mn-55|magnes|آفریقای جنوبی|~۲$/kg|۴","Fe":"Fe-56|ferrum|استرالیا|~۰.۱$/kg|۱",
+    "Co":"Co-59|kobold|کنگو|~۳۳$/kg|۶","Ni":"Ni-58|kupfernickel|اندونزی|~۱۶$/kg|۴",
+    "Cu":"Cu-63,65|cuprum|شیلی|~۹$/kg|۳","Zn":"Zn-64|zink|چین|~۳$/kg|۳",
+    "Ga":"Ga-69,71|Gallia|چین|~۲۰۰$/kg|۷","Ge":"Ge-74|Germania|چین|~۱۲۰۰$/kg|۸",
+    "As":"As-75|arsenikon|چین|~۲$/kg|۵","Se":"Se-80|selene|ژاپن|~۵۵$/kg|۶",
+    "Br":"Br-79,81|bromos|اسرائیل|~۵$/kg|۴","Kr":"Kr-84|kryptos|جو|~۲۹۰$/kg|۸",
+    "Rb":"Rb-85,87|rubidus|کانادا|~۱۵۵۰۰$/kg|۸","Sr":"Sr-88|Strontian|اسپانیا|~۷$/kg|۴",
+    "Y":"Y-89|Ytterby|چین|~۳۰$/kg|۶","Zr":"Zr-90|zargun|استرالیا|~۳۵$/kg|۵",
+    "Nb":"Nb-93|Niobe|برزیل|~۸۵$/kg|۶","Mo":"Mo-98|molybdos|چین|~۴۰$/kg|۵",
+    "Tc":"Tc-99|technetos|مصنوعی|~۶۰M$/kg|۱۰","Ru":"Ru-102|Ruthenia|روسیه|~۱۵۰۰۰$/kg|۹",
+    "Rh":"Rh-103|rhodon|آفریقای جنوبی|~۱۵۰M$/kg|۱۰","Pd":"Pd-106|Pallas|روسیه|~۵۰M$/kg|۹",
+    "Ag":"Ag-107,109|argentum|مکزیک|~۹۰۰$/kg|۷","Cd":"Cd-114|cadmia|چین|~۳$/kg|۵",
+    "In":"In-115|نیلی|چین|~۲۰۰$/kg|۷","Sn":"Sn-120|stannum|چین|~۲۵$/kg|۴",
+    "Sb":"Sb-121,123|anti+monos|چین|~۶$/kg|۵","Te":"Te-130|tellus|چین|~۷۵$/kg|۷",
+    "I":"I-127|iodes|شیلی|~۳۵$/kg|۵","Xe":"Xe-132|xenon|جو|~۱۸۰۰$/kg|۸",
+    "Cs":"Cs-133|caesius|کانادا|~۶۲۰۰۰$/kg|۹","Ba":"Ba-138|barys|چین|~۰.۵$/kg|۴",
+    "La":"La-139|lanthanein|چین|~۵$/kg|۵","Ce":"Ce-140|Ceres|چین|~۵$/kg|۵",
+    "Pr":"Pr-141|prasios|چین|~۱۰۰$/kg|۶","Nd":"Nd-142|neos+didymos|چین|~۶۰$/kg|۶",
+    "Pm":"Pm-145|Prometheus|مصنوعی|~۵۰۰M$/kg|۱۰","Sm":"Sm-152|samarskite|چین|~۳$/kg|۵",
+    "Eu":"Eu-153|اروپا|چین|~۳۰$/kg|۷","Gd":"Gd-158|گادولین|چین|~۳۰$/kg|۶",
+    "Tb":"Tb-159|Ytterby|چین|~۹۰۰$/kg|۸","Dy":"Dy-164|dysprositos|چین|~۳۰۰$/kg|۷",
+    "Ho":"Ho-165|Holmia|چین|~۶۰$/kg|۷","Er":"Er-166|Ytterby|چین|~۳۰$/kg|۶",
+    "Tm":"Tm-169|Thule|چین|~۵۰$/kg|۸","Yb":"Yb-174|Ytterby|چین|~۲۰$/kg|۶",
+    "Lu":"Lu-175|Lutetia|چین|~۹۰۰$/kg|۸","Hf":"Hf-180|Hafnia|استرالیا|~۹۰۰$/kg|۷",
+    "Ta":"Ta-181|Tantalus|کنگو|~۱۵۰$/kg|۷","W":"W-184|tung sten|چین|~۳۵$/kg|۵",
+    "Re":"Re-187|Rhenus|شیلی|~۴۰۰۰$/kg|۹","Os":"Os-192|osme|روسیه|~۱۲۰۰۰$/kg|۹",
+    "Ir":"Ir-193|iris|آفریقای جنوبی|~۱۵۰M$/kg|۱۰","Pt":"Pt-195|platina|آفریقای جنوبی|~۳۲M$/kg|۹",
+    "Au":"Au-197|aurum|چین|~۶۵M$/kg|۱۰","Hg":"Hg-202|Mercury|اسپانیا|~۳۰$/kg|۶",
+    "Tl":"Tl-205|thallos|چین|~۶۰۰۰$/kg|۹","Pb":"Pb-208|plumbum|چین|~۲$/kg|۴",
+    "Bi":"Bi-209|weisse masse|چین|~۱۰$/kg|۶","Po":"Po-209|لهستان|مصنوعی|~۵۰M$/kg|۱۰",
+    "At":"At-210|astatos|مصنوعی|N/A|۱۰","Rn":"Rn-222|radium|طبیعی|N/A|۸",
+    "Fr":"Fr-223|فرانسه|مصنوعی|N/A|۱۰","Ra":"Ra-226|radius|کنگو|N/A|۱۰",
+    "Ac":"Ac-227|aktis|مصنوعی|N/A|۱۰","Th":"Th-232|Thor|هند|~۳۰۰$/kg|۷",
+    "Pa":"Pa-231|protactinium|مصنوعی|N/A|۱۰","U":"U-238|Uranus|قزاقستان|~۱۰۰$/kg|۷",
+    "Np":"Np-237|Neptune|مصنوعی|N/A|۱۰","Pu":"Pu-239|Pluto|مصنوعی|N/A|۱۰",
+    "Am":"Am-243|America|مصنوعی|N/A|۱۰","Cm":"Cm-247|کوری‌ها|مصنوعی|N/A|۱۰",
+    "Bk":"Bk-247|برکلی|مصنوعی|N/A|۱۰","Cf":"Cf-251|کالیفرنیا|مصنوعی|N/A|۱۰",
+    "Es":"Es-252|اینشتین|مصنوعی|N/A|۱۰","Fm":"Fm-257|فرمی|مصنوعی|N/A|۱۰",
+    "Md":"Md-258|مندلیف|مصنوعی|N/A|۱۰","No":"No-259|نوبل|مصنوعی|N/A|۱۰",
+    "Lr":"Lr-266|لارنس|مصنوعی|N/A|۱۰","Rf":"Rf-267|رادرفورد|مصنوعی|N/A|۱۰",
+    "Db":"Db-268|دوبنا|مصنوعی|N/A|۱۰","Sg":"Sg-269|سیبورگ|مصنوعی|N/A|۱۰",
+    "Bh":"Bh-270|بور|مصنوعی|N/A|۱۰","Hs":"Hs-269|هس|مصنوعی|N/A|۱۰",
+    "Mt":"Mt-278|مایتنر|مصنوعی|N/A|۱۰","Ds":"Ds-281|دارمشتات|مصنوعی|N/A|۱۰",
+    "Rg":"Rg-282|رونتگن|مصنوعی|N/A|۱۰","Cn":"Cn-285|کوپرنیک|مصنوعی|N/A|۱۰",
+    "Nh":"Nh-286|ژاپن|مصنوعی|N/A|۱۰","Fl":"Fl-289|فلروف|مصنوعی|N/A|۱۰",
+    "Mc":"Mc-290|مسکو|مصنوعی|N/A|۱۰","Lv":"Lv-293|لیورمور|مصنوعی|N/A|۱۰",
+    "Ts":"Ts-294|تنسی|مصنوعی|N/A|۱۰","Og":"Og-294|اوگانسسون|مصنوعی|N/A|۱۰",
 }
 for el in elements:
     extra = ELEMENT_EXTRA.get(el["symbol"],"|نامشخص|نامشخص|نامشخص|۱۰")
@@ -273,7 +213,7 @@ for el in elements:
     el["rarity"] = parts[4]
 
 # ============================================================
-# ۲. داده‌های کانی‌ها (۱۸۰)
+# ۲. کانی‌ها (۱۸۲) — کامل (بدون حذف)
 # ============================================================
 MINERALS_STR = """
 کوارتز|SiO₂|سیلیکات|۷|بی‌رنگ|شیشه|ساعت|الکترونیک|فراوان‌ترین کانی پوسته.
@@ -468,52 +408,48 @@ for line in MINERALS_STR.strip().split('\n'):
             "color":p[4],"uses":p[5:8] if len(p)>=8 else [p[5]],"description":p[-1]
         })
 
-# داده تکمیلی کانی‌ها: محل | قیمت | کمیابی | کانی‌های همراه | کشورها
 MINERAL_EXTRA = {
-    "کوارتز":"برزیل، ماداگاسکار، ایران|۵$/kg|۳|فلدسپات، میکا|برزیل، ایران، ماداگاسکار، آمریکا",
-    "آمتیست":"برزیل، اروگوئه، زامبیا|۱۰$/g|۵|کوارتز|برزیل، اروگوئه، زامبیا",
-    "زمرد":"کلمبیا، زامبیا، برزیل، افغانستان|۳۰۰۰$/g|۹|کوارتز، فلدسپات، بریل|کلمبیا، زامبیا، افغانستان، برزیل",
-    "یاقوت":"میانمار، سریلانکا، تایلند، ایران|۱۵۰۰$/g|۹|کوراندوم، اسپینل|میانمار، سریلانکا، تایلند، ایران",
-    "سفایر":"سریلانکا، ماداگاسکار، میانمار|۸۰۰$/g|۸|کوراندوم، اسپینل|سریلانکا، ماداگاسکار، ایران",
-    "الماس":"آفریقای جنوبی، روسیه، بوتسوانا|۵۰۰۰۰$/g|۱۰|کیمبرلیت|آفریقای جنوبی، روسیه، بوتسوانا",
-    "طلا":"چین، استرالیا، روسیه، آمریکا|۶۵$/g|۱۰|کوارتز، پیریت|ایران، چین، استرالیا",
-    "نقره":"مکزیک، پرو، چین|۰.۹$/g|۷|گالن، اسفالریت|مکزیک، پرو، ایران",
-    "مس":"شیلی، پرو، چین، ایران|۰.۰۱$/g|۳|کالکوپیریت، مالاکیت|ایران، شیلی، پرو",
-    "هماتیت":"استرالیا، برزیل، چین، ایران|۰.۰۰۰۱$/g|۱|مگنتیت، گوتیت|ایران، استرالیا، برزیل",
-    "پیریت":"جهان|۰.۰۰۱$/g|۴|کوارتز، کالکوپیریت|جهان",
-    "گالن":"استرالیا، آمریکا، مکزیک|۰.۰۲$/g|۵|اسفالریت، سیدریت|ایران، استرالیا، مکزیک",
-    "اسفالریت":"چین، پرو، استرالیا|۰.۰۳$/g|۴|گالن، پیریت|ایران، چین، استرالیا",
-    "کالکوپیریت":"شیلی، پرو، اندونزی|۰.۰۱$/g|۳|پیریت، بورنیت|ایران، شیلی، پرو",
-    "فلوریت":"چین، مکزیک، آفریقای جنوبی|۰.۳$/g|۴|کوارتز، کلسیت|ایران، چین، مکزیک",
-    "باریت":"چین، هند، مراکش، ایران|۰.۱$/g|۴|گالن، فلوریت|ایران، چین، هند",
-    "کلسیت":"جهان|۰.۰۱$/g|۱|کوارتز، دولومیت|ایران، جهان",
-    "تالک":"چین، هند، برزیل، ایران|۰.۲$/g|۲|کلریت، منیزیت|ایران، چین، هند",
-    "کائولینیت":"چین، آمریکا، ایران|۰.۰۰۵$/g|۲|کوارتز، میکا|ایران، چین، آمریکا",
-    "اورانینیت":"استرالیا، قزاقستان، کانادا|۶۰$/g|۷|پیتچبلند|استرالیا، قزاقستان، کانادا",
-    "بوکسیت":"گینه، استرالیا، برزیل، ایران|۰.۰۰۱$/g|۲|هماتیت، گوتیت|ایران، گینه، استرالیا",
-    "کرومیت":"آفریقای جنوبی، قزاقستان، ایران|۰.۰۰۵$/g|۴|الیوین، سرپانتین|ایران، آفریقای جنوبی",
+    "کوارتز":"برزیل، ایران|۵$/kg|۳|فلدسپات|برزیل، ایران، آمریکا",
+    "آمتیست":"برزیل، اروگوئه|۱۰$/g|۵|کوارتز|برزیل، اروگوئه، زامبیا",
+    "زمرد":"کلمبیا، زامبیا|۳۰۰۰$/g|۹|کوارتز، بریل|کلمبیا، زامبیا، افغانستان",
+    "یاقوت":"میانمار، ایران|۱۵۰۰$/g|۹|کوراندوم|میانمار، سریلانکا، ایران",
+    "سفایر":"سریلانکا، ماداگاسکار|۸۰۰$/g|۸|کوراندوم|سریلانکا، ایران",
+    "الماس":"آفریقای جنوبی، روسیه|۵۰۰۰۰$/g|۱۰|کیمبرلیت|آفریقای جنوبی، روسیه",
+    "طلا":"چین، استرالیا|۶۵$/g|۱۰|کوارتز، پیریت|ایران، چین، استرالیا",
+    "نقره":"مکزیک، پرو|۰.۹$/g|۷|گالن|مکزیک، ایران",
+    "مس":"شیلی، ایران|۰.۰۱$/g|۳|کالکوپیریت|ایران، شیلی",
+    "هماتیت":"استرالیا، ایران|۰.۰۰۰۱$/g|۱|مگنتیت|ایران، استرالیا",
+    "پیریت":"جهان|۰.۰۰۱$/g|۴|کوارتز|جهان",
+    "گالن":"استرالیا، مکزیک|۰.۰۲$/g|۵|اسفالریت|ایران، استرالیا",
+    "اسفالریت":"چین، استرالیا|۰.۰۳$/g|۴|گالن|ایران، چین",
+    "کالکوپیریت":"شیلی، اندونزی|۰.۰۱$/g|۳|پیریت|ایران، شیلی",
+    "فلوریت":"چین، مکزیک|۰.۳$/g|۴|کوارتز|ایران، چین",
+    "باریت":"چین، ایران|۰.۱$/g|۴|گالن|ایران، چین، هند",
+    "کلسیت":"جهان|۰.۰۱$/g|۱|کوارتز|ایران، جهان",
+    "تالک":"چین، ایران|۰.۲$/g|۲|کلریت|ایران، چین، هند",
+    "کائولینیت":"چین، ایران|۰.۰۰۵$/g|۲|کوارتز|ایران، چین، آمریکا",
+    "اورانینیت":"استرالیا، کانادا|۶۰$/g|۷|پیتچبلند|استرالیا، کانادا",
+    "بوکسیت":"گینه، ایران|۰.۰۰۱$/g|۲|هماتیت|ایران، گینه",
+    "کرومیت":"آفریقای جنوبی، ایران|۰.۰۰۵$/g|۴|الیوین|ایران، آفریقای جنوبی",
 }
 for m in minerals:
     extra = MINERAL_EXTRA.get(m["name"],"نامشخص|نامشخص|۵|نامشخص|جهان")
     parts = extra.split("|")
     while len(parts) < 5: parts.append("نامشخص")
-    m["location"] = parts[0]
-    m["price"] = parts[1]
-    m["rarity"] = parts[2]
-    m["associated"] = parts[3]
-    m["countries"] = parts[4].split("،")
+    m["location"] = parts[0]; m["price"] = parts[1]; m["rarity"] = parts[2]
+    m["associated"] = parts[3]; m["countries"] = parts[4].split("،")
 
 # ============================================================
-# ۳. داده‌های سنگ‌ها (۱۸۰)
+# ۳. سنگ‌ها (۱۸۰) — کامل (بدون حذف)
 # ============================================================
 ROCKS_STR = """
 گرانیت|آذرین|درونی|کوارتز، فلدسپات، میکا|درشت‌بلور|روشن|ساختمان|نما|فرش|رایج‌ترین آذرین درونی.
-گرانودیوریت|آذرین|درونی|پلاژیوکلاز، کوارتز، هورنبلند|درشت‌بلور|خاکستری|ساختمان|نما|فرش|حدواسط گرانیت/دیوریت.
-تونالیت|آذرین|درونی|پلاژیوکلاز، کوارتز، بیوتیت|درشت‌بلور|خاکستری|نما|فرش|ساختمان|گرانیتوئید.
+گرانودیوریت|آذرین|درونی|پلاژیوکلاز، کوارتز، هورنبلند|درشت‌بلور|خاکستری|ساختمان|نما|فرش|حدواسط.
+تونالیت|آذرین|درونی|پلاژیوکلاز، کوارتز|درشت‌بلور|خاکستری|نما|فرش|ساختمان|گرانیتوئید.
 سینیت|آذرین|درونی|فلدسپات قلیایی، آمفیبول|درشت‌بلور|خاکستری|نما|فرش|تزئینی|بدون کوارتز.
 دیوریت|آذرین|درونی|پلاژیوکلاز، آمفیبول|درشت‌بلور|خاکستری|ساختمان|نما|مجسمه|حدواسط.
 گابرو|آذرین|درونی|پلاژیوکلاز، پیروکسن|درشت‌بلور|تیره|فرش|نما|صنعتی|معادل بازالت.
-نوریت|آذرین|درونی|پلاژیوکلاز، ارتوپیروکسن|درشت‌بلور|تیره|فرش|صنعتی|نما|گابرو با ارتوپیروکسن.
+نوریت|آذرین|درونی|پلاژیوکلاز، ارتوپیروکسن|درشت‌بلور|تیره|فرش|صنعتی|نما|گابرو.
 آنورتوزیت|آذرین|درونی|پلاژیوکلاز|درشت‌بلور|روشن|نما|تزئینی|فرش|غنی از پلاژیوکلاز.
 پریدوتیت|آذرین|درونی|الیوین، پیروکسن|درشت‌بلور|سبز تیره|کروم|نیکل|پژوهش|سنگ گوشته.
 دونیت|آذرین|درونی|الیوین|درشت‌بلور|سبز|نسوز|پژوهش|صنعتی|اولترامافیک.
@@ -527,7 +463,7 @@ ROCKS_STR = """
 آندزیت|آذرین|بیرونی|پلاژیوکلاز، هورنبلند|پورفیری|خاکستری|ساختمان|نما|فرش|حدواسط.
 داسیت|آذرین|بیرونی|پلاژیوکلاز، کوارتز|پورفیری|روشن|ساختمان|نما|صنعتی|فلسیک.
 ریولیت|آذرین|بیرونی|کوارتز، فلدسپات|ریزبلور|روشن|نما|تزئینی|صنعتی|معادل گرانیت.
-تراکیت|آذرین|بیرونی|فلدسپات قلیایی|ریزبلور|روشن|ساختمان|نما|صنعتی|آتشفشانی قلیایی.
+تراکیت|آذرین|بیرونی|فلدسپات قلیایی|ریزبلور|روشن|ساختمان|نما|صنعتی|قلیایی.
 لاتیت|آذرین|بیرونی|فلدسپات، پلاژیوکلاز|پورفیری|خاکستری|نما|فرش|صنعتی|حدواسط.
 فونولیت|آذرین|بیرونی|نفلین، فلدسپات|ریزبلور|خاکستری|تزئینی|صنعتی|نما|قلیایی.
 تفریت|آذرین|بیرونی|پلاژیوکلاز، فویید|ریزبلور|تیره|صنعتی|پژوهش|فرش|قلیایی.
@@ -711,28 +647,20 @@ for line in ROCKS_STR.strip().split('\n'):
         })
 
 ROCK_EXTRA = {
-    "گرانیت":"ایران (همدان، نطنز)، برزیل، هند|سخت و مقاوم",
-    "بازالت":"ایران (سبلان)، ایسلند، هاوایی|مقاوم به فشار",
-    "مرمر":"ایران (مراغه)، ایتالیا|قابل صیقل",
-    "سنگ آهک":"ایران (زنجان)، فرانسه|نرم و قابل برش",
-    "ماسه‌سنگ":"ایران (تهران)، آمریکا|مقاوم به فرسایش",
-    "شیست":"ایران (همدان)، آمریکا|برگوار",
-    "گنایس":"ایران (سنگستان)، کانادا|نواری",
-    "کوارتزیت":"ایران (کرمان)، آمریکا|بسیار سخت",
-    "تراورتن":"ایران (آذرشهر)، ترکیه|متخلخل و زیبا",
-    "ابسیدین":"ایران (آذربایجان)، مکزیک|شیشه‌ای",
-    "پومیس":"ایران (قزوین)، ایتالیا|سبک",
+    "گرانیت":"ایران، برزیل|سخت","بازالت":"ایران، ایسلند|مقاوم","مرمر":"ایران، ایتالیا|قابل صیقل",
+    "سنگ آهک":"ایران، فرانسه|نرم","ماسه‌سنگ":"ایران، آمریکا|مقاوم","شیست":"ایران، آمریکا|برگوار",
+    "گنایس":"ایران، کانادا|نواری","کوارتزیت":"ایران، آمریکا|بسیار سخت","تراورتن":"ایران، ترکیه|متخلخل",
+    "ابسیدین":"ایران، مکزیک|شیشه‌ای","پومیس":"ایران، ایتالیا|سبک",
 }
 for r in rocks:
     extra = ROCK_EXTRA.get(r["name"],"جهان|متوسط")
     parts = extra.split("|")
-    r["location"] = parts[0]
-    r["quality"] = parts[1] if len(parts)>1 else "متوسط"
+    r["location"] = parts[0]; r["quality"] = parts[1] if len(parts)>1 else "متوسط"
 
 print(f"عناصر: {len(elements)} | کانی‌ها: {len(minerals)} | سنگ‌ها: {len(rocks)}")
 
 # ============================================================
-# ۴. قالب HTML (طراحی شیشه‌ای روشن + اتم سه‌بعدی + فیلتر)
+# ۴. HTML — نسخهٔ اصلاح‌شده (مودال وسط، تم بدون تصادفی، 3D اتم)
 # ============================================================
 HTML = """
 <!DOCTYPE html>
@@ -742,34 +670,31 @@ HTML = """
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>اطلس زمین‌شناسی | مهراد ترابی</title>
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0f0c29">
 <style>
 :root{
   --bg1:#0f0c29;--bg2:#1a1a3e;--bg3:#24243e;--bg4:#0a0a1a;
-  --glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.12);
-  --text:#e8e8f0;--text-muted:#9898b0;
-  --accent:#8b5cf6;--accent2:#06b6d4;--accent3:#ec4899;--accent-glow:rgba(139,92,246,0.3);
+  --glass:rgba(255,255,255,.08);--glass-border:rgba(255,255,255,.16);
+  --glass-strong:rgba(255,255,255,.14);
+  --text:#f0f0f8;--text-muted:#b8b8d0;
+  --accent:#8b5cf6;--accent2:#06b6d4;--accent3:#ec4899;--accent-glow:rgba(139,92,246,.45);
   --radius:24px;--transition:all .35s cubic-bezier(.4,0,.2,1);
   --font-size-base:16px;
+  --card-bg:rgba(30,41,59,.5);
+  --header-bg:rgba(15,12,41,.75);
 }
-/* تم‌ها */
-.theme-ocean{--bg1:#cffafe;--bg2:#e0f2fe;--bg3:#bae6fd;--bg4:#a5f3fc;--accent:#0ea5e9;--accent2:#06b6d4;--accent3:#14b8a6;--accent-glow:rgba(14,165,233,.3);--text:#0f172a;--text-muted:#475569;}
-.theme-fire{--bg1:#fee2e2;--bg2:#fed7aa;--bg3:#fecaca;--bg4:#fef3c7;--accent:#ef4444;--accent2:#f97316;--accent3:#eab308;--accent-glow:rgba(239,68,68,.3);--text:#450a0a;--text-muted:#7f1d1d;}
-.theme-forest{--bg1:#dcfce7;--bg2:#d1fae5;--bg3:#bbf7d0;--bg4:#ecfccb;--accent:#059669;--accent2:#10b981;--accent3:#84cc16;--accent-glow:rgba(5,150,105,.3);--text:#064e3b;--text-muted:#065f46;}
-.theme-light{--bg1:#e0f2fe;--bg2:#f3e8ff;--bg3:#fce7f3;--bg4:#dbeafe;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.75);--text:#1e293b;--text-muted:#64748b;}
-
-/* حالت مطالعه */
-.reading{
-  --bg1:#fdf6e3;--bg2:#fef3c7;--bg3:#fef9e7;--bg4:#fefae0;
-  --text:#3f3f46;--text-muted:#78716c;
-  --font-size-base:18px;
-  --accent:#92400e;--accent2:#a16207;--accent3:#b45309;
-}
-.reading .card p,.reading .desc{font-size:1rem;line-height:1.9}
-.reading .card h3{font-size:1.15rem}
-.reading #particles,.reading #three-bg,.reading .card-actions,.reading .compare-bar{display:none!important}
-.reading header{background:rgba(254,243,199,.85)}
+.theme-ocean{--bg1:#cffafe;--bg2:#e0f2fe;--bg3:#bae6fd;--bg4:#a5f3fc;--glass:rgba(255,255,255,.5);--glass-border:rgba(14,165,233,.25);--glass-strong:rgba(255,255,255,.7);--text:#082f49;--text-muted:#0369a1;--accent:#0ea5e9;--accent2:#06b6d4;--accent3:#14b8a6;--accent-glow:rgba(14,165,233,.35);--card-bg:rgba(255,255,255,.6);--header-bg:rgba(255,255,255,.75);}
+.theme-fire{--bg1:#fef3c7;--bg2:#ffedd5;--bg3:#fee2e2;--bg4:#fef9e7;--glass:rgba(255,255,255,.55);--glass-border:rgba(239,68,68,.22);--glass-strong:rgba(255,255,255,.75);--text:#7c2d12;--text-muted:#9a3412;--accent:#dc2626;--accent2:#ea580c;--accent3:#ca8a04;--accent-glow:rgba(220,38,38,.35);--card-bg:rgba(255,255,255,.65);--header-bg:rgba(255,255,255,.75);}
+.theme-forest{--bg1:#dcfce7;--bg2:#d1fae5;--bg3:#bbf7d0;--bg4:#ecfccb;--glass:rgba(255,255,255,.55);--glass-border:rgba(5,150,105,.22);--glass-strong:rgba(255,255,255,.75);--text:#064e3b;--text-muted:#047857;--accent:#059669;--accent2:#10b981;--accent3:#84cc16;--accent-glow:rgba(5,150,105,.35);--card-bg:rgba(255,255,255,.65);--header-bg:rgba(255,255,255,.75);}
+.theme-light{--bg1:#f8fafc;--bg2:#f3e8ff;--bg3:#fce7f3;--bg4:#dbeafe;--glass:rgba(255,255,255,.65);--glass-border:rgba(139,92,246,.2);--glass-strong:rgba(255,255,255,.85);--text:#1e1b4b;--text-muted:#6d28d9;--accent:#8b5cf6;--accent2:#06b6d4;--accent3:#ec4899;--accent-glow:rgba(139,92,246,.3);--card-bg:rgba(255,255,255,.75);--header-bg:rgba(255,255,255,.85);}
+.theme-sunset{--bg1:#fed7aa;--bg2:#fbcfe8;--bg3:#fce7f3;--bg4:#fef3c7;--glass:rgba(255,255,255,.55);--glass-border:rgba(249,115,22,.22);--glass-strong:rgba(255,255,255,.72);--text:#7c2d12;--text-muted:#9a3412;--accent:#f97316;--accent2:#a855f7;--accent3:#ec4899;--accent-glow:rgba(249,115,22,.4);--card-bg:rgba(255,255,255,.65);--header-bg:rgba(255,255,255,.75);}
+.theme-mint{--bg1:#d1fae5;--bg2:#a7f3d0;--bg3:#cffafe;--bg4:#ecfeff;--glass:rgba(255,255,255,.55);--glass-border:rgba(16,185,129,.22);--glass-strong:rgba(255,255,255,.72);--text:#022c22;--text-muted:#065f46;--accent:#10b981;--accent2:#06b6d4;--accent3:#14b8a6;--accent-glow:rgba(16,185,129,.4);--card-bg:rgba(255,255,255,.65);--header-bg:rgba(255,255,255,.75);}
+.theme-rose{--bg1:#ffe4e6;--bg2:#fce7f3;--bg3:#fef3c7;--bg4:#fff1f2;--glass:rgba(255,255,255,.6);--glass-border:rgba(225,29,72,.2);--glass-strong:rgba(255,255,255,.78);--text:#4c0519;--text-muted:#831843;--accent:#e11d48;--accent2:#ec4899;--accent3:#f59e0b;--accent-glow:rgba(225,29,72,.35);--card-bg:rgba(255,255,255,.68);--header-bg:rgba(255,255,255,.78);}
+.theme-royal{--bg1:#ede9fe;--bg2:#e9d5ff;--bg3:#f3e8ff;--bg4:#fae8ff;--glass:rgba(255,255,255,.55);--glass-border:rgba(124,58,237,.22);--glass-strong:rgba(255,255,255,.72);--text:#2e1065;--text-muted:#5b21b6;--accent:#7c3aed;--accent2:#a855f7;--accent3:#d946ef;--accent-glow:rgba(124,58,237,.4);--card-bg:rgba(255,255,255,.65);--header-bg:rgba(255,255,255,.75);}
+.theme-steel{--bg1:#f8fafc;--bg2:#e2e8f0;--bg3:#f1f5f9;--bg4:#cbd5e1;--glass:rgba(255,255,255,.6);--glass-border:rgba(71,85,105,.2);--glass-strong:rgba(255,255,255,.78);--text:#0f172a;--text-muted:#475569;--accent:#475569;--accent2:#0891b2;--accent3:#7c3aed;--accent-glow:rgba(71,85,105,.3);--card-bg:rgba(255,255,255,.72);--header-bg:rgba(255,255,255,.82);}
+.theme-cyberpunk{--bg1:#0a0a1a;--bg2:#1e1b4b;--bg3:#2e1065;--bg4:#000;--glass:rgba(34,211,238,.06);--glass-border:rgba(34,211,238,.25);--glass-strong:rgba(34,211,238,.12);--text:#f0fdfa;--text-muted:#67e8f9;--accent:#22d3ee;--accent2:#a3e635;--accent3:#f472b6;--accent-glow:rgba(34,211,238,.5);--card-bg:rgba(15,23,42,.6);--header-bg:rgba(10,10,26,.85);}
 
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
@@ -779,106 +704,84 @@ body{
   color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .6s,color .3s;
 }
 @keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:4px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:8px}
 
-#progress-bar{position:fixed;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:9999;width:0%;transition:width .1s;display:none}
+#progress-bar{position:fixed;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:9999;width:0%;transition:width .1s;display:none;box-shadow:0 0 10px var(--accent)}
 #progress-bar.visible{display:block}
-#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;display:none}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;display:none}
 #particles.visible{display:block}
-#three-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;display:none}
+#three-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;display:none}
 #three-bg.visible{display:block}
 
-/* صفحه خوش‌آمدگویی (منوی اصلی) — اسکرول‌پذیر و بدون بریدگی */
-#landing{
-  position:relative;min-height:100vh;width:100%;
-  display:flex;flex-direction:column;align-items:center;
-  padding:60px 20px 40px;
-  background:radial-gradient(circle at top, rgba(139,92,246,0.15), transparent 50%);
-  transition:opacity .5s, transform .5s;z-index:1000;
-}
+/* صفحه خوش‌آمد */
+#landing{position:relative;min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;padding:60px 20px 40px;background:radial-gradient(circle at top,var(--accent-glow),transparent 60%);transition:opacity .5s,transform .5s;z-index:1000}
 #landing.hidden{opacity:0;transform:scale(.98);pointer-events:none;position:absolute}
-.hero-section{text-align:center;margin-bottom:50px;max-width:800px;width:100%}
-.landing-title{
-  font-size:clamp(2.5rem,6vw,4rem);font-weight:800;color:var(--text);
-  text-shadow:0 0 30px var(--accent-glow);margin-bottom:16px;letter-spacing:-1px;
-}
-.landing-sub{font-size:clamp(1rem,2vw,1.2rem);color:var(--text-muted);line-height:1.6}
-.hero-section::after{content:'';display:block;width:100px;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));margin:24px auto 0;border-radius:2px}
+.hero-section{text-align:center;margin-bottom:50px;max-width:900px;width:100%}
 
-.menu-grid{
-  display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-  gap:24px;width:100%;max-width:1100px;margin-bottom:60px;
-}
-.menu-card{
-  background:var(--glass);border:1px solid var(--glass-border);
-  border-radius:28px;padding:35px 25px;text-align:center;cursor:pointer;
-  backdrop-filter:blur(20px);transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position:relative;overflow:hidden;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-.menu-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 70%);opacity:0;transition:.4s}
-.menu-card:hover{transform:translateY(-10px);border-color:var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.4), 0 0 30px var(--accent-glow)}
+/* تیتر شیشه‌ای مایع */
+.liquid-glass-title{position:relative;display:inline-block;padding:32px 60px;margin-bottom:20px;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04));backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.28);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35),0 0 80px var(--accent-glow);overflow:hidden;animation:glassFloat 6s ease-in-out infinite}
+@keyframes glassFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.liquid-glass-title h1{font-family:'Playfair Display','Vazirmatn',sans-serif;font-size:clamp(2.2rem,5.5vw,3.6rem);font-weight:900;letter-spacing:-1px;line-height:1.2;background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 25%,var(--accent3) 50%,var(--accent2) 75%,var(--accent) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:liquidFlow 5s linear infinite;filter:drop-shadow(0 0 20px var(--accent-glow))}
+@keyframes liquidFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.liquid-glass-title::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.4) 50%,transparent 60%);background-size:200% 100%;animation:glassShine 3.5s ease-in-out infinite;pointer-events:none}
+@keyframes glassShine{0%{background-position:200% 0}60%{background-position:-200% 0}100%{background-position:-200% 0}}
+.landing-sub{font-size:clamp(1rem,2vw,1.2rem);color:var(--text-muted);font-weight:600;letter-spacing:.5px;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.hero-section::after{content:'';display:block;width:120px;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));margin:24px auto 0;border-radius:2px;box-shadow:0 0 20px var(--accent-glow)}
+
+/* منو */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;width:100%;max-width:1100px;margin-bottom:60px;perspective:1200px}
+.menu-card{background:var(--glass-strong);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-border);border-radius:28px;padding:35px 25px;text-align:center;cursor:pointer;transition:transform .5s cubic-bezier(.175,.885,.32,1.275),box-shadow .3s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.25);transform-style:preserve-3d;animation:menuAppear .6s cubic-bezier(.4,0,.2,1) both}
+.menu-card:nth-child(1){animation-delay:.05s}.menu-card:nth-child(2){animation-delay:.1s}.menu-card:nth-child(3){animation-delay:.15s}.menu-card:nth-child(4){animation-delay:.2s}.menu-card:nth-child(5){animation-delay:.25s}.menu-card:nth-child(6){animation-delay:.3s}.menu-card:nth-child(7){animation-delay:.35s}
+@keyframes menuAppear{from{opacity:0;transform:translateY(30px) rotateX(-10deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
+.menu-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--accent-glow),transparent 70%);opacity:0;transition:.4s;z-index:0}
 .menu-card:hover::before{opacity:1}
-.menu-card .icon{font-size:3.5rem;margin-bottom:16px;position:relative;z-index:1;filter:drop-shadow(0 0 15px rgba(255,255,255,0.2));transition:transform 0.4s}
-.menu-card:hover .icon{transform:scale(1.1) rotate(5deg)}
-.menu-card h2{font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:8px;position:relative;z-index:1}
-.menu-card p{font-size:0.95rem;color:var(--text-muted);position:relative;z-index:1}
+.menu-card:hover{border-color:var(--accent);box-shadow:0 30px 60px rgba(0,0,0,.35),0 0 40px var(--accent-glow),inset 0 1px 0 rgba(255,255,255,.35)}
+.menu-card .icon{font-size:3.5rem;margin-bottom:16px;position:relative;z-index:1;filter:drop-shadow(0 0 15px rgba(255,255,255,.3));transition:transform .4s;transform:translateZ(30px)}
+.menu-card:hover .icon{transform:scale(1.15) rotate(8deg) translateZ(50px)}
+.menu-card h2{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:8px;position:relative;z-index:1;transform:translateZ(20px)}
+.menu-card p{font-size:.9rem;color:var(--text-muted);position:relative;z-index:1;transform:translateZ(15px)}
 
 .landing-footer{text-align:center;margin-top:auto;padding:30px 20px;width:100%;max-width:800px;border-top:1px solid var(--glass-border)}
 .landing-footer .author{font-size:1rem;color:var(--text);margin-bottom:12px}
-.landing-footer .author strong{color:var(--accent2);font-weight:700;font-size:1.15rem}
+.landing-footer .author strong{color:var(--accent2);font-weight:700;font-size:1.15rem;text-shadow:0 0 15px var(--accent-glow)}
 .landing-footer .quote{font-size:.9rem;color:var(--text-muted);font-style:italic;line-height:1.7}
 
-/* هدر سایت اصلی */
-#app-content{display:none;min-height:100vh;animation:fadeIn .5s ease;position:relative;z-index:2}
-#app-content.active{display:block}
-header{
-  position:sticky;top:0;z-index:100;padding:12px 20px;
-  backdrop-filter:blur(24px);background:rgba(15,12,41,0.85);
-  border-bottom:1px solid var(--glass-border);
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-}
-.theme-light header{background:rgba(255,255,255,0.85)}
-.reading header{background:rgba(254,243,199,0.85)}
+/* هدر */
+#app-content{display:none;min-height:100vh;position:relative;z-index:2}
+#app-content.active{display:block;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+header{position:sticky;top:0;z-index:100;padding:12px 20px;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);background:var(--header-bg);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .logo-area{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.logo-area h1{
-  display:inline-block !important;font-size:1.15rem !important;font-weight:800 !important;
-  color:var(--text) !important;white-space:nowrap !important;line-height:1.8 !important;
-  border-right:3px solid var(--accent) !important;padding:6px 12px !important;
-  margin:0 !important;letter-spacing:0 !important;text-shadow:none !important;
-  background:transparent !important;-webkit-text-fill-color:var(--text) !important;
-  visibility:visible !important;opacity:1 !important;
-}
+.logo-area h1{display:inline-block !important;font-size:1.15rem !important;font-weight:800 !important;color:var(--text) !important;-webkit-text-fill-color:var(--text) !important;white-space:nowrap !important;line-height:1.8 !important;border-right:3px solid var(--accent) !important;padding:6px 12px !important;margin:0 !important;letter-spacing:0 !important;text-shadow:0 0 15px var(--accent-glow) !important;background:transparent !important}
 nav{display:flex;gap:6px;flex-wrap:wrap;margin-right:auto;align-items:center;overflow-x:auto;padding:4px 0}
-.nav-btn{
-  background:var(--glass);border:1px solid var(--glass-border);color:var(--text);
-  padding:7px 13px;border-radius:30px;cursor:pointer;font-family:inherit;
-  font-size:.8rem;font-weight:600;transition:var(--transition);backdrop-filter:blur(10px);
-  display:flex;align-items:center;gap:5px;white-space:nowrap;
-}
-.nav-btn:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
+.nav-btn{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);padding:7px 13px;border-radius:30px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:var(--transition);display:flex;align-items:center;gap:5px;white-space:nowrap;backdrop-filter:blur(10px)}
+.nav-btn:hover{background:var(--glass-strong);transform:translateY(-2px)}
 .nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 20px var(--accent-glow)}
 .icon-btn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;font-size:1rem}
-.icon-btn.active{background:var(--accent3)!important;border-color:var(--accent3)!important}
 
-.theme-picker{position:absolute;top:60px;left:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:12px;backdrop-filter:blur(20px);display:none;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-.theme-picker.show{display:block}
+.theme-picker{position:absolute;top:60px;left:20px;background:var(--header-bg);backdrop-filter:blur(24px);border:1px solid var(--glass-border);border-radius:20px;padding:14px;display:none;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:300px;flex-wrap:wrap}
+.theme-picker.show{display:flex}
 .theme-picker .theme-opt{width:32px;height:32px;border-radius:50%;display:inline-block;margin:4px;cursor:pointer;border:3px solid transparent;transition:var(--transition)}
 .theme-picker .theme-opt:hover{transform:scale(1.15)}
-.theme-picker .theme-opt.active{border-color:var(--text)}
-.theme-default{background:linear-gradient(135deg,#1a1a3e,#0f0c29)}
+.theme-picker .theme-opt.active{border-color:var(--text);box-shadow:0 0 12px var(--accent-glow)}
+.theme-default{background:linear-gradient(135deg,#1a1a3e,#8b5cf6)}
 .theme-ocean-opt{background:linear-gradient(135deg,#cffafe,#0ea5e9)}
-.theme-fire-opt{background:linear-gradient(135deg,#fee2e2,#ef4444)}
+.theme-fire-opt{background:linear-gradient(135deg,#fef3c7,#dc2626)}
 .theme-forest-opt{background:linear-gradient(135deg,#dcfce7,#059669)}
-.theme-light-opt{background:linear-gradient(135deg,#e0f2fe,#f3e8ff)}
+.theme-light-opt{background:linear-gradient(135deg,#f8fafc,#8b5cf6)}
+.theme-sunset-opt{background:linear-gradient(135deg,#f97316,#a855f7,#ec4899)}
+.theme-mint-opt{background:linear-gradient(135deg,#10b981,#06b6d4)}
+.theme-rose-opt{background:linear-gradient(135deg,#e11d48,#f59e0b)}
+.theme-royal-opt{background:linear-gradient(135deg,#7c3aed,#d946ef)}
+.theme-steel-opt{background:linear-gradient(135deg,#475569,#0891b2)}
+.theme-cyberpunk-opt{background:linear-gradient(135deg,#22d3ee,#a3e635,#f472b6)}
 
 main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:1}
-.tab-content{display:none;animation:fadeUp .45s ease}
-.tab-content.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:tabSlide3D .55s cubic-bezier(.4,0,.2,1)}
+@keyframes tabSlide3D{from{opacity:0;transform:translateY(30px) perspective(1200px) rotateX(-8deg)}to{opacity:1;transform:translateY(0) perspective(1200px) rotateX(0)}}
 
-/* جستجو */
 .search-wrap{display:flex;justify-content:center;margin-bottom:20px;gap:8px}
 .search-wrap input{width:100%;max-width:420px;padding:11px 20px;border-radius:30px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text);font-family:inherit;font-size:.9rem;backdrop-filter:blur(10px);transition:var(--transition);outline:none}
 .search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
@@ -891,140 +794,155 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
 .history-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:15px}
 .history-chip{font-size:.72rem;padding:4px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);cursor:pointer;transition:var(--transition);color:var(--text)}
 .history-chip:hover{background:var(--accent);color:#fff}
-.history-chip .x{margin-right:4px;opacity:.6;cursor:pointer}
 
-/* جدول مندلیف */
 .periodic-grid{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;overflow-x:auto;padding-bottom:10px}
-.element-cell{aspect-ratio:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;cursor:pointer;transition:transform .15s ease-out,border-color .15s ease-out;position:relative;min-width:46px;contain:layout style paint}
-.element-cell:hover{transform:scale(1.1);z-index:10;border-color:var(--accent)}
-.element-cell:hover{transform:scale(1.14);z-index:10;box-shadow:0 0 20px var(--accent-glow);border-color:var(--accent)}
+.element-cell{aspect-ratio:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;cursor:pointer;transition:transform .15s ease-out,border-color .15s ease-out,box-shadow .15s;position:relative;min-width:46px;contain:layout style paint}
+.element-cell:hover{transform:scale(1.15);z-index:10;border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
 .element-number{font-size:.55rem;color:var(--text-muted);position:absolute;top:2px;right:4px}
 .element-symbol{font-size:1rem;font-weight:700}
 .element-name{font-size:.45rem;color:var(--text-muted);text-align:center;line-height:1.1}
 .blk-s{background:rgba(6,182,212,.18)}.blk-p{background:rgba(139,92,246,.18)}.blk-d{background:rgba(245,158,11,.15)}.blk-f{background:rgba(236,72,153,.15)}.blk-unknown{background:rgba(148,163,184,.12)}
 .lanth-grid{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;margin-top:12px}
 
-/* شبکه کارت‌ها */
 .content-layout{display:flex;gap:16px;align-items:flex-start}
-.sidebar{width:230px;flex-shrink:0;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px;backdrop-filter:blur(20px);position:sticky;top:75px;max-height:calc(100vh - 90px);overflow-y:auto}
+.sidebar{width:230px;flex-shrink:0;background:var(--glass-strong);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px;position:sticky;top:75px;max-height:calc(100vh - 90px);overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15)}
 .sidebar h3{font-size:.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600;margin-top:10px}
 .sidebar h3:first-child{margin-top:0}
 .sidebar-item{padding:5px 10px;border-radius:9px;cursor:pointer;font-size:.78rem;transition:var(--transition);margin-bottom:3px;display:flex;justify-content:space-between;align-items:center;gap:6px}
-.sidebar-item:hover{background:rgba(255,255,255,.1)}
-.sidebar-item.active{background:var(--accent);color:#fff}
+.sidebar-item:hover{background:var(--glass-strong)}
+.sidebar-item.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px var(--accent-glow)}
 .sidebar-item .count{font-size:.65rem;opacity:.75;background:rgba(0,0,0,.15);padding:1px 7px;border-radius:10px}
-.sidebar-item.active .count{background:rgba(255,255,255,.2)}
-.sidebar-group{margin-bottom:4px}
-.sidebar-group-header{padding:5px 10px;border-radius:9px;cursor:pointer;font-size:.8rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;background:rgba(139,92,246,.08);transition:var(--transition)}
-.sidebar-group-header:hover{background:rgba(139,92,246,.15)}
-.sidebar-group-content{padding-right:10px;display:none;margin-top:3px}
-.sidebar-group.open .sidebar-group-content{display:block}
-.sidebar-group-header .arrow{transition:transform .3s;display:inline-block}
-.sidebar-group.open .arrow{transform:rotate(90deg)}
+.sidebar-item.active .count{background:rgba(255,255,255,.25)}
 .filter-panel{padding:10px 0;border-top:1px solid var(--glass-border);margin-top:10px}
 .filter-panel label{font-size:.72rem;color:var(--text-muted);display:block;margin-bottom:4px}
 .filter-panel input[type=range]{width:100%;margin:4px 0;accent-color:var(--accent)}
 .reset-btn{width:100%;padding:8px;background:var(--accent3);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:700;margin-top:10px;transition:var(--transition)}
-.reset-btn:hover{background:#be185d;transform:scale(1.02)}
-.card-grid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:13px 15px;backdrop-filter:blur(20px);transition:var(--transition);cursor:pointer;animation:cardIn .4s ease both;position:relative}
-.card:hover{box-shadow:0 12px 40px rgba(0,0,0,.2);border-color:var(--accent);transform:translateY(-4px)}
-@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.card h3{font-size:.94rem;margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.card-meta{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+.reset-btn:hover{transform:scale(1.02);box-shadow:0 4px 15px rgba(236,72,153,.4)}
+
+.card-grid{flex:1;column-count:3;column-gap:16px}
+@media(max-width:1024px){.card-grid{column-count:2}}
+@media(max-width:768px){.card-grid{column-count:1}}
+
+.card{background:var(--card-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px 16px;transition:transform .4s,box-shadow .3s;cursor:pointer;position:relative;break-inside:avoid;margin-bottom:16px;display:inline-block;width:100%;transform-style:preserve-3d;box-shadow:0 4px 15px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.15)}
+.card:hover{box-shadow:0 20px 40px rgba(0,0,0,.25),0 0 30px var(--accent-glow);border-color:var(--accent)}
+.card::before{content:'';position:absolute;inset:0;border-radius:var(--radius);background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.15) 45%,transparent 60%);background-size:200% 200%;background-position:100% 100%;opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1;animation:glareSweep 1.2s ease-out}
+@keyframes glareSweep{0%{background-position:100% 100%}100%{background-position:-100% -100%}}
+.card h3{font-size:.98rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;position:relative;z-index:2}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;position:relative;z-index:2}
 .tag{font-size:.63rem;padding:2px 8px;border-radius:20px;background:rgba(139,92,246,.15);color:var(--accent);border:1px solid rgba(139,92,246,.3)}
 .tag-cyan{background:rgba(6,182,212,.15);color:var(--accent2);border-color:rgba(6,182,212,.3)}
 .tag-pink{background:rgba(236,72,153,.15);color:var(--accent3);border-color:rgba(236,72,153,.3)}
-.card p{font-size:.75rem;line-height:1.5;color:var(--text-muted)}
-.card-actions{position:absolute;top:8px;left:8px;display:flex;gap:4px;opacity:0;transition:var(--transition)}
+.card p{font-size:.8rem;line-height:1.6;color:var(--text-muted);position:relative;z-index:2}
+.card-actions{position:absolute;top:10px;left:10px;display:flex;gap:4px;opacity:0;transition:var(--transition);z-index:3}
 .card:hover .card-actions{opacity:1}
-.action-btn{width:26px;height:26px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:var(--transition);color:var(--text)}
+.action-btn{width:28px;height:28px;border-radius:50%;background:var(--glass-strong);border:1px solid var(--glass-border);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:var(--transition);color:var(--text);backdrop-filter:blur(5px)}
 .action-btn:hover{transform:scale(1.15);background:var(--accent);color:#fff}
 .action-btn.fav{background:var(--accent3);color:#fff}
 
-/* مودال */
-.modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+/* ============ مودال وسط صفحه (اصلاح‌شده) ============ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;visibility:hidden;
+  transition:opacity .3s,visibility .3s;
+}
 .modal-overlay.open{opacity:1;visibility:visible}
-.modal{background:var(--bg2);border:1px solid var(--glass-border);border-radius:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;backdrop-filter:blur(30px);transform:scale(.92) translateY(20px);transition:transform .35s cubic-bezier(.4,0,.2,1);position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal{
+  background:var(--header-bg);
+  backdrop-filter:blur(30px) saturate(180%);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--glass-border);
+  border-radius:24px;
+  max-width:600px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:32px;
+  position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 40px var(--accent-glow);
+  transform:scale(.9) translateY(20px);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
 .modal-overlay.open .modal{transform:scale(1) translateY(0)}
 .modal.fullscreen{max-width:100vw;max-height:100vh;width:100vw;height:100vh;border-radius:0;padding:40px}
-.modal-close{position:absolute;top:12px;left:14px;background:var(--glass);border:1px solid var(--glass-border);color:var(--text);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;transition:var(--transition);z-index:10}
-.modal-close:hover{background:rgba(239,68,68,.2)}
-.modal h2{font-size:1.25rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.modal-tools{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.modal-tools button{font-size:.7rem;padding:5px 11px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);cursor:pointer;font-family:inherit;color:var(--text);transition:var(--transition)}
-.modal-tools button:hover{background:var(--accent);color:#fff}
-.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.85rem;gap:12px}
-.theme-light .detail-row{border-bottom-color:rgba(0,0,0,.06)}
+.modal-close{position:absolute;top:14px;left:14px;background:var(--glass-strong);border:1px solid var(--glass-border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;transition:var(--transition);z-index:10}
+.modal-close:hover{background:rgba(239,68,68,.3);transform:rotate(90deg)}
+.modal h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-tools{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.modal-tools button{font-size:.72rem;padding:6px 13px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);cursor:pointer;font-family:inherit;color:var(--text);transition:var(--transition)}
+.modal-tools button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--glass-border);font-size:.88rem;gap:12px}
 .detail-row .label{color:var(--text-muted);flex-shrink:0}
 .detail-row .value{font-weight:600;text-align:left;direction:ltr;word-break:break-word}
 .detail-row .value.uses{text-align:right;direction:rtl}
 .uses-list{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
-.use-tag{font-size:.68rem;padding:2px 8px;border-radius:12px;background:rgba(6,182,212,.15);color:var(--accent2);border:1px solid rgba(6,182,212,.3)}
-.desc{margin-top:14px;font-size:.86rem;line-height:1.7;color:var(--text-muted)}
+.use-tag{font-size:.68rem;padding:2px 8px;border-radius:12px;background:rgba(6,182,212,.18);color:var(--accent2);border:1px solid rgba(6,182,212,.3)}
+.desc{margin-top:16px;font-size:.88rem;line-height:1.8;color:var(--text-muted)}
 .formula-click{cursor:pointer;border-bottom:1px dotted var(--accent);transition:var(--transition)}
 .formula-click:hover{color:var(--accent)}
-.atom-svg{margin:14px 0;text-align:center}
+.atom-svg{margin:16px 0;text-align:center;filter:drop-shadow(0 0 20px var(--accent-glow))}
 .rarity-stars{color:#fbbf24;font-size:.95rem;letter-spacing:1px}
-.trend-bar-container{margin-top:14px;padding:12px;background:rgba(139,92,246,.06);border-radius:12px}
-.trend-bar-container h4{font-size:.78rem;margin-bottom:8px;color:var(--text-muted)}
-.trend-bar{height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;margin-bottom:6px}
-.trend-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s ease}
-.trend-label{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-muted);margin-bottom:2px}
+.trend-bar-container{margin-top:16px;padding:14px;background:rgba(139,92,246,.08);border-radius:14px}
+.trend-bar-container h4{font-size:.82rem;margin-bottom:10px;color:var(--text-muted)}
+.trend-bar{height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.trend-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .6s ease}
+.trend-label{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);margin-bottom:3px}
 
-/* مقایسه */
-.compare-bar{position:fixed;bottom:20px;right:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:10px 16px;backdrop-filter:blur(20px);display:none;align-items:center;gap:10px;z-index:500;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.compare-bar{position:fixed;bottom:20px;right:20px;background:var(--header-bg);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:20px;padding:10px 16px;display:none;align-items:center;gap:10px;z-index:500;box-shadow:0 8px 30px rgba(0,0,0,.2)}
 .compare-bar.show{display:flex}
-.compare-bar .item-preview{font-size:.78rem;padding:5px 10px;background:rgba(6,182,212,.15);border-radius:12px;display:flex;align-items:center;gap:5px}
+.compare-bar .item-preview{font-size:.78rem;padding:5px 10px;background:rgba(6,182,212,.18);border-radius:12px;display:flex;align-items:center;gap:5px}
 .compare-bar .item-preview .x{cursor:pointer;font-size:.85rem}
 .compare-btn{background:var(--accent2);color:#fff;border:none;padding:7px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700;transition:var(--transition)}
 .compare-btn:hover{transform:scale(1.05)}
 .compare-btn:disabled{opacity:.5;cursor:not-allowed}
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-.compare-col{background:rgba(139,92,246,.06);border-radius:14px;padding:14px}
+.compare-col{background:rgba(139,92,246,.08);border-radius:14px;padding:14px}
 .compare-col h3{font-size:.95rem;margin-bottom:10px;color:var(--accent)}
 .compare-col .detail-row{font-size:.78rem;padding:5px 0}
 
-/* صدای محیطی */
-.sound-panel{position:fixed;bottom:20px;left:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:12px;backdrop-filter:blur(20px);z-index:400;display:none;flex-direction:column;gap:6px}
+.sound-panel{position:fixed;bottom:20px;left:20px;background:var(--header-bg);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:20px;padding:12px;z-index:400;display:none;flex-direction:column;gap:6px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
 .sound-panel.show{display:flex}
 .sound-panel h4{font-size:.75rem;color:var(--text-muted);margin-bottom:4px}
-.sound-panel button{background:var(--glass);border:1px solid var(--glass-border);padding:6px 12px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:.75rem;color:var(--text);transition:var(--transition)}
+.sound-panel button{background:var(--glass);border:1px solid var(--glass-border);padding:7px 14px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:.75rem;color:var(--text);transition:var(--transition);text-align:right}
 .sound-panel button:hover{background:var(--accent);color:#fff}
-.sound-panel button.active{background:var(--accent);color:#fff}
+.sound-panel button.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px var(--accent-glow)}
 
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--accent);color:#fff;padding:12px 24px;border-radius:30px;font-size:.85rem;box-shadow:0 8px 30px var(--accent-glow);z-index:3000;opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* چرخه سنگ و تایم‌لاین */
-.rock-cycle-wrap{max-width:800px;margin:0 auto;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(20px)}
+.rock-cycle-wrap{max-width:800px;margin:0 auto;background:var(--glass-strong);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px}
 .rock-cycle-svg{width:100%;height:auto}
 .cycle-node{cursor:pointer;transition:var(--transition)}
-.cycle-node:hover circle{stroke-width:4;filter:drop-shadow(0 0 10px var(--accent))}
+.cycle-node:hover circle{stroke-width:4;filter:drop-shadow(0 0 12px var(--accent))}
 .timeline-wrap{max-width:1100px;margin:0 auto;padding:20px 0;overflow-x:auto}
-.timeline-track{display:flex;gap:0;position:relative;min-width:900px;padding:40px 20px 20px}
-.timeline-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));border-radius:2px;z-index:0}
+.timeline-track{display:flex;position:relative;min-width:900px;padding:40px 20px 20px}
+.timeline-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));border-radius:2px;z-index:0;box-shadow:0 0 15px var(--accent-glow)}
 .tl-point{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:0 12px;z-index:1}
 .tl-dot{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid var(--bg2);box-shadow:0 0 0 3px var(--accent);cursor:pointer;transition:var(--transition)}
-.tl-dot:hover{transform:scale(1.4);background:var(--accent3)}
+.tl-dot:hover{transform:scale(1.5);background:var(--accent3)}
 .tl-year{font-size:.7rem;font-weight:700;color:var(--text-muted);margin-top:8px;white-space:nowrap}
 .tl-name{font-size:.72rem;font-weight:600;color:var(--text);margin-top:4px;text-align:center;max-width:90px;line-height:1.3}
 
+@media(hover:none) and (pointer:coarse){.card:hover,.menu-card:hover,.element-cell:hover{transform:none !important}}
 @media(max-width:768px){
   .periodic-grid,.lanth-grid{grid-template-columns:repeat(9,1fr)}
-  .element-cell{min-width:36px}.element-name{display:none}
-  .content-layout{flex-direction:column}.sidebar{width:100%;position:static;max-height:none;display:flex;flex-wrap:wrap;gap:5px;padding:8px}
-  .sidebar h3{width:100%}.sidebar-group{flex:1 1 45%}.sidebar-item{padding:4px 8px;font-size:.72rem}
-  .card-grid{grid-template-columns:1fr}.nav-btn{padding:6px 10px;font-size:.72rem}
+  .element-cell{min-width:36px}
+  .element-name{display:none}
+  .content-layout{flex-direction:column}
+  .sidebar{width:100%;position:static;max-height:none;display:flex;flex-wrap:wrap;gap:5px;padding:8px}
+  .sidebar h3{width:100%}
+  .sidebar-item{padding:4px 8px;font-size:.72rem}
+  .nav-btn{padding:6px 10px;font-size:.72rem}
   .logo-area h1{font-size:.9rem;padding:4px 8px !important;border-right-width:2px !important}
-  .modal{padding:20px}.menu-grid{grid-template-columns:1fr}
-  .landing-title{font-size:2rem}
+  .modal{max-width:100vw;border-radius:20px;padding:20px}
+  .menu-grid{grid-template-columns:1fr}
+  .liquid-glass-title{padding:20px 30px;border-radius:24px}
+  .liquid-glass-title h1{font-size:1.6rem}
 }
-
 @media print{
-  header,.nav-btn,.search-wrap,.sidebar,.mic-btn,.card-actions,.modal-tools,.compare-bar,.toast,#progress-bar,.modal-close,.history-chips,#particles,#three-bg,.sound-panel{display:none!important}
+  header,.nav-btn,.search-wrap,.sidebar,.mic-btn,.card-actions,.modal-tools,.compare-bar,.toast,#progress-bar,.modal-close,.history-chips,#particles,#three-bg,.sound-panel,.theme-picker{display:none!important}
   body{background:#fff;color:#000}
-  .card{break-inside:avoid;border:1px solid #ccc}
+  .card{break-inside:avoid;border:1px solid #ccc;backdrop-filter:none}
   .modal-overlay{position:static;opacity:1;visibility:visible;background:#fff;padding:0}
   .modal{box-shadow:none;max-height:none;background:#fff;color:#000;transform:none!important;max-width:100%}
 }
@@ -1036,63 +954,29 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
 <canvas id="particles"></canvas>
 <div id="three-bg"></div>
 
-<!-- صفحه خوش‌آمدگویی -->
 <div id="landing">
   <div class="hero-section">
-    <div class="landing-title">⚛️ اطلس زمین‌شناسی 🌍</div>
+    <div class="liquid-glass-title"><h1>⚛️ اطلس زمین‌شناسی 🌍</h1></div>
     <div class="landing-sub">سفری به دنیای عناصر، کانی‌ها و سنگ‌ها</div>
   </div>
-
   <div class="menu-grid">
-    <div class="menu-card" onclick="enterApp('periodic')">
-      <div class="icon">⚛️</div>
-      <h2>جدول مندلیف</h2>
-      <p>۱۱۸ عنصر با ۱۰ ویژگی</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('minerals')">
-      <div class="icon">💎</div>
-      <h2>کانی‌ها</h2>
-      <p>{{ minerals_count }} کانی ارزشمند</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('rocks')">
-      <div class="icon">🪨</div>
-      <h2>سنگ‌ها</h2>
-      <p>{{ rocks_count }} سنگ در ۳ گروه</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('hardness')">
-      <div class="icon">📏</div>
-      <h2>مقیاس سختی</h2>
-      <p>موس تعاملی</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('rockcycle')">
-      <div class="icon">🔄</div>
-      <h2>چرخه سنگ</h2>
-      <p>دیاگرام تعاملی</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('timeline')">
-      <div class="icon">📜</div>
-      <h2>تایم‌لاین</h2>
-      <p>تاریخچه کشفیات</p>
-    </div>
-    <div class="menu-card" onclick="enterApp('favorites')">
-      <div class="icon">⭐</div>
-      <h2>علاقه‌مندی‌ها</h2>
-      <p>موارد ذخیره‌شده</p>
-    </div>
+    <div class="menu-card" onclick="enterApp('periodic')"><div class="icon">⚛️</div><h2>جدول مندلیف</h2><p>۱۱۸ عنصر با ۱۰ ویژگی</p></div>
+    <div class="menu-card" onclick="enterApp('minerals')"><div class="icon">💎</div><h2>کانی‌ها</h2><p>{{ minerals_count }} کانی ارزشمند</p></div>
+    <div class="menu-card" onclick="enterApp('rocks')"><div class="icon">🪨</div><h2>سنگ‌ها</h2><p>{{ rocks_count }} سنگ در ۳ گروه</p></div>
+    <div class="menu-card" onclick="enterApp('hardness')"><div class="icon">📏</div><h2>مقیاس سختی</h2><p>موس تعاملی</p></div>
+    <div class="menu-card" onclick="enterApp('rockcycle')"><div class="icon">🔄</div><h2>چرخه سنگ</h2><p>دیاگرام تعاملی</p></div>
+    <div class="menu-card" onclick="enterApp('timeline')"><div class="icon">📜</div><h2>تایم‌لاین</h2><p>تاریخچه کشفیات</p></div>
+    <div class="menu-card" onclick="enterApp('favorites')"><div class="icon">⭐</div><h2>علاقه‌مندی‌ها</h2><p>موارد ذخیره‌شده</p></div>
   </div>
-
   <footer class="landing-footer">
     <div class="author">✍️ نویسنده: <strong>مهراد ترابی</strong></div>
-    <div class="quote">«در هر اتم، جهانی از شگفتی نهفته است و در هر سنگ، داستانی از میلیون‌ها سال. زمین، کتابی است که با هر کانی ورق می‌خورد.»</div>
+    <div class="quote">«در هر اتم، جهانی از شگفتی نهفته است و در هر سنگ، داستانی از میلیون‌ها سال.»</div>
   </footer>
 </div>
 
-<!-- محتوای اصلی سایت -->
 <div id="app-content">
   <header>
-    <div class="logo-area">
-      <h1>اطلس زمین‌شناسی</h1>
-    </div>
+    <div class="logo-area"><h1>اطلس زمین‌شناسی</h1></div>
     <nav>
       <button class="nav-btn active" data-tab="periodic">⚛️ مندلیف</button>
       <button class="nav-btn" data-tab="minerals">💎 کانی‌ها</button>
@@ -1101,9 +985,9 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
       <button class="nav-btn" data-tab="rockcycle">🔄 چرخه</button>
       <button class="nav-btn" data-tab="timeline">📜 تایم‌لاین</button>
       <button class="nav-btn" data-tab="favorites">⭐ علاقه</button>
-      <button class="nav-btn icon-btn" id="theme-toggle" title="تم">🎨</button>
+      <button class="nav-btn icon-btn" id="theme-toggle" title="انتخاب تم">🎨</button>
       <button class="nav-btn icon-btn" id="reading-toggle" title="حالت مطالعه">📖</button>
-      <button class="nav-btn icon-btn" id="sound-toggle" title="صدا">🔇</button>
+      <button class="nav-btn icon-btn" id="sound-toggle" title="صدای محیطی">🔇</button>
       <button class="nav-btn icon-btn" onclick="goBackToMenu()" title="بازگشت به منو">🏠</button>
     </nav>
     <div class="theme-picker" id="theme-picker">
@@ -1112,15 +996,18 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
       <div class="theme-opt theme-fire-opt" data-theme="theme-fire" title="آتش"></div>
       <div class="theme-opt theme-forest-opt" data-theme="theme-forest" title="جنگل"></div>
       <div class="theme-opt theme-light-opt" data-theme="theme-light" title="روشن"></div>
+      <div class="theme-opt theme-sunset-opt" data-theme="theme-sunset" title="غروب"></div>
+      <div class="theme-opt theme-mint-opt" data-theme="theme-mint" title="نعنایی"></div>
+      <div class="theme-opt theme-rose-opt" data-theme="theme-rose" title="رزگلد"></div>
+      <div class="theme-opt theme-royal-opt" data-theme="theme-royal" title="سلطنتی"></div>
+      <div class="theme-opt theme-steel-opt" data-theme="theme-steel" title="فولادی"></div>
+      <div class="theme-opt theme-cyberpunk-opt" data-theme="theme-cyberpunk" title="سایبرپانک"></div>
     </div>
   </header>
 
   <main>
     <section id="periodic" class="tab-content active">
-      <div class="search-wrap">
-        <input type="text" id="element-search" placeholder="🔍 جستجوی عنصر...">
-        <button class="mic-btn" id="mic-element">🎤</button>
-      </div>
+      <div class="search-wrap"><input type="text" id="element-search" placeholder="🔍 جستجوی عنصر..."><button class="mic-btn" id="mic-element">🎤</button></div>
       <div id="element-history" class="history-chips"></div>
       <div class="periodic-grid" id="periodic-main"></div>
       <div style="text-align:center;color:var(--text-muted);font-size:.8rem;margin:12px 0;">🔹 لانتانیدها و اکتینیدها 🔹</div>
@@ -1128,27 +1015,15 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
     </section>
 
     <section id="minerals" class="tab-content">
-      <div class="search-wrap">
-        <input type="text" id="mineral-search" placeholder="🔍 جستجوی کانی...">
-        <button class="mic-btn" id="mic-mineral">🎤</button>
-      </div>
+      <div class="search-wrap"><input type="text" id="mineral-search" placeholder="🔍 جستجوی کانی..."><button class="mic-btn" id="mic-mineral">🎤</button></div>
       <div id="mineral-history" class="history-chips"></div>
-      <div class="content-layout">
-        <aside class="sidebar" id="mineral-sidebar"></aside>
-        <div id="minerals-grid" class="card-grid"></div>
-      </div>
+      <div class="content-layout"><aside class="sidebar" id="mineral-sidebar"></aside><div id="minerals-grid" class="card-grid"></div></div>
     </section>
 
     <section id="rocks" class="tab-content">
-      <div class="search-wrap">
-        <input type="text" id="rock-search" placeholder="🔍 جستجوی سنگ...">
-        <button class="mic-btn" id="mic-rock">🎤</button>
-      </div>
+      <div class="search-wrap"><input type="text" id="rock-search" placeholder="🔍 جستجوی سنگ..."><button class="mic-btn" id="mic-rock">🎤</button></div>
       <div id="rock-history" class="history-chips"></div>
-      <div class="content-layout">
-        <aside class="sidebar" id="rock-sidebar"></aside>
-        <div id="rocks-grid" class="card-grid"></div>
-      </div>
+      <div class="content-layout"><aside class="sidebar" id="rock-sidebar"></aside><div id="rocks-grid" class="card-grid"></div></div>
     </section>
 
     <section id="hardness" class="tab-content">
@@ -1183,9 +1058,12 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
 
 <div class="sound-panel" id="sound-panel">
   <h4>🎵 صدای محیطی</h4>
-  <button data-snd="rain">🌧️ باران</button>
-  <button data-snd="wind">💨 باد</button>
-  <button data-snd="ocean">🌊 اقیانوس</button>
+  <button data-snd="fire">🔥 آتش</button>
+  <button data-snd="waterfall">💦 آبشار</button>
+  <button data-snd="cave">🕳️ غار</button>
+  <button data-snd="night">🌙 شب</button>
+  <button data-snd="space">🌌 فضا</button>
+  <button data-snd="storm">⛈️ طوفان</button>
   <button data-snd="off">⏹️ خاموش</button>
 </div>
 
@@ -1201,955 +1079,274 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
 const elementsData = {{ elements_json | safe }};
 const mineralsData = {{ minerals_json | safe }};
 const rocksData = {{ rocks_json | safe }};
-
 const $ = id => document.getElementById(id);
 const STORAGE = { theme:'atlas-theme', sound:'atlas-sound', fav:'atlas-fav', hist:'atlas-hist', reading:'atlas-reading' };
 
-function toast(msg){
-  const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(window._toastT);
-  window._toastT = setTimeout(()=>t.classList.remove('show'), 2200);
-}
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(window._toastT); window._toastT = setTimeout(()=>t.classList.remove('show'), 2200); }
 
-// ============ Sound ============
-let audioCtx = null;
-let soundEnabled = localStorage.getItem(STORAGE.sound) === 'on';
-let ambientNode = null, ambientType = null;
-
-function initAudio(){
-  if(!audioCtx) try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
-  return audioCtx;
-}
-function playClick(){
-  if(!soundEnabled) return;
-  const ctx = initAudio(); if(!ctx) return;
-  try{
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = 800; o.type='sine';
-    g.gain.setValueAtTime(.05, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.06);
-    o.start(); o.stop(ctx.currentTime+.06);
-  }catch(e){}
-}
-function makeNoise(ctx){
-  const bufSize = 2*ctx.sampleRate;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for(let i=0;i<bufSize;i++) d[i] = Math.random()*2-1;
-  return buf;
-}
+// صدا
+let audioCtx=null, soundEnabled=localStorage.getItem(STORAGE.sound)==='on', ambientNode=null;
+function initAudio(){ if(!audioCtx) try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} return audioCtx; }
+function playClick(){ if(!soundEnabled) return; const ctx=initAudio(); if(!ctx) return; try{ const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=800; o.type='sine'; g.gain.setValueAtTime(.05,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.06); o.start(); o.stop(ctx.currentTime+.06); }catch(e){} }
+function makeNoise(ctx,dur){ const bufSize=Math.floor((dur||2)*ctx.sampleRate); const buf=ctx.createBuffer(1,bufSize,ctx.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<bufSize;i++) d[i]=Math.random()*2-1; return buf; }
 function startAmbient(type){
-  stopAmbient();
-  if(type === 'off' || !type) return;
-  const ctx = initAudio(); if(!ctx) return;
+  stopAmbient(); if(type==='off'||!type) return;
+  const ctx=initAudio(); if(!ctx) return;
   try{
-    const noise = ctx.createBufferSource();
-    noise.buffer = makeNoise(ctx); noise.loop = true;
-    const filter = ctx.createBiquadFilter();
-    const gain = ctx.createGain();
-    if(type === 'rain'){ filter.type='highpass'; filter.frequency.value=1000; gain.gain.value=.15; }
-    else if(type === 'wind'){ filter.type='lowpass'; filter.frequency.value=400; gain.gain.value=.2; }
-    else if(type === 'ocean'){ filter.type='lowpass'; filter.frequency.value=600; gain.gain.value=.25; }
-    noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-    noise.start();
-    ambientNode = { source:noise, gain, filter };
-    ambientType = type;
-    if(type === 'ocean'){
-      const lfo = ctx.createOscillator(), lfoGain = ctx.createGain();
-      lfo.frequency.value = .08; lfoGain.gain.value = .15;
-      lfo.connect(lfoGain); lfoGain.connect(gain.gain);
-      lfo.start();
-      ambientNode.lfo = lfo;
+    const sources=[], intervals=[], master=ctx.createGain(); master.connect(ctx.destination);
+    if(type==='fire'){
+      master.gain.value=.35;
+      const n=ctx.createBufferSource(); n.buffer=makeNoise(ctx,2); n.loop=true;
+      const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1400; bp.Q.value=.6;
+      const g=ctx.createGain(); g.gain.value=.4;
+      n.connect(bp); bp.connect(g); g.connect(master); n.start(); sources.push(n);
+      intervals.push(setInterval(()=>{ if(!ambientNode) return; try{ const o=ctx.createOscillator(),gg=ctx.createGain(); o.type='square'; o.frequency.value=120+Math.random()*300; o.connect(gg); gg.connect(master); gg.gain.setValueAtTime(.12,ctx.currentTime); gg.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04); o.start(); o.stop(ctx.currentTime+.04); }catch(e){} }, 250+Math.random()*400));
+    } else if(type==='waterfall'){
+      master.gain.value=.4;
+      const n=ctx.createBufferSource(); n.buffer=makeNoise(ctx,3); n.loop=true;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900; lp.Q.value=.3;
+      const g=ctx.createGain(); g.gain.value=.7;
+      n.connect(lp); lp.connect(g); g.connect(master); n.start(); sources.push(n);
+      const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=.15; lg.gain.value=.15; lfo.connect(lg); lg.connect(g.gain); lfo.start(); sources.push(lfo);
+    } else if(type==='cave'){
+      master.gain.value=.5;
+      const d=ctx.createOscillator(), dg=ctx.createGain(); d.type='sine'; d.frequency.value=60; dg.gain.value=.15; d.connect(dg); dg.connect(master); d.start(); sources.push(d);
+      intervals.push(setInterval(()=>{ if(!ambientNode) return; try{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(800+Math.random()*400,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(400,ctx.currentTime+.15); o.connect(g); g.connect(master); g.gain.setValueAtTime(.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5); o.start(); o.stop(ctx.currentTime+.5); }catch(e){} }, 1500+Math.random()*2000));
+    } else if(type==='night'){
+      master.gain.value=.35;
+      const w=ctx.createBufferSource(); w.buffer=makeNoise(ctx,2); w.loop=true;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=400;
+      const wg=ctx.createGain(); wg.gain.value=.2; w.connect(lp); lp.connect(wg); wg.connect(master); w.start(); sources.push(w);
+      intervals.push(setInterval(()=>{ if(!ambientNode) return; try{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=4000+Math.random()*1000; o.connect(g); g.connect(master); for(let k=0;k<3;k++){ const t=ctx.currentTime+k*.06; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.08,t+.01); g.gain.linearRampToValueAtTime(0,t+.04); } o.start(); o.stop(ctx.currentTime+.25); }catch(e){} }, 600+Math.random()*800));
+    } else if(type==='space'){
+      master.gain.value=.4;
+      [55,82.5,110].forEach(f=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.value=.15; o.connect(g); g.connect(master); o.start(); sources.push(o); });
+      const sh=ctx.createOscillator(), shg=ctx.createGain(); sh.type='sine'; sh.frequency.value=1200; shg.gain.value=.03; sh.connect(shg); shg.connect(master); sh.start(); sources.push(sh);
+      const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=.2; lg.gain.value=.02; lfo.connect(lg); lg.connect(shg.gain); lfo.start(); sources.push(lfo);
+    } else if(type==='storm'){
+      master.gain.value=.35;
+      const r=ctx.createBufferSource(); r.buffer=makeNoise(ctx,2); r.loop=true;
+      const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=800;
+      const rg=ctx.createGain(); rg.gain.value=.5; r.connect(hp); hp.connect(rg); rg.connect(master); r.start(); sources.push(r);
+      intervals.push(setInterval(()=>{ if(!ambientNode) return; try{ const n=ctx.createBufferSource(); n.buffer=makeNoise(ctx,1.5); const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=150; const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime); g.gain.linearRampToValueAtTime(.7,ctx.currentTime+.1); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+1.5); n.connect(lp); lp.connect(g); g.connect(master); n.start(); n.stop(ctx.currentTime+1.5); }catch(e){} }, 5000+Math.random()*5000));
     }
+    ambientNode={sources,master,intervals};
   }catch(e){ toast('خطا در پخش صدا'); }
 }
-function stopAmbient(){
-  if(ambientNode){
-    try{ ambientNode.source.stop(); if(ambientNode.lfo) ambientNode.lfo.stop(); }catch(e){}
-    ambientNode = null; ambientType = null;
-  }
-}
-function updateSoundBtn(){
-  $('sound-toggle').textContent = soundEnabled?'🔊':'🔇';
-  $('sound-panel').classList.toggle('show', soundEnabled);
-}
-$('sound-toggle').addEventListener('click', ()=>{
-  soundEnabled = !soundEnabled;
-  localStorage.setItem(STORAGE.sound, soundEnabled?'on':'off');
-  if(!soundEnabled) stopAmbient();
-  updateSoundBtn();
-  if(soundEnabled) playClick();
-});
-document.querySelectorAll('.sound-panel button').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    document.querySelectorAll('.sound-panel button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    startAmbient(b.dataset.snd);
-  });
-});
+function stopAmbient(){ if(ambientNode){ try{ ambientNode.sources.forEach(s=>{try{s.stop()}catch(e){}}); ambientNode.intervals.forEach(i=>clearInterval(i)); }catch(e){} ambientNode=null; } }
+function updateSoundBtn(){ $('sound-toggle').textContent=soundEnabled?'🔊':'🔇'; $('sound-panel').classList.toggle('show',soundEnabled); }
+$('sound-toggle').addEventListener('click',()=>{ soundEnabled=!soundEnabled; localStorage.setItem(STORAGE.sound,soundEnabled?'on':'off'); if(!soundEnabled) stopAmbient(); updateSoundBtn(); if(soundEnabled) playClick(); });
+document.querySelectorAll('.sound-panel button').forEach(b=>{ b.addEventListener('click',()=>{ document.querySelectorAll('.sound-panel button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); startAmbient(b.dataset.snd); }); });
 updateSoundBtn();
 
-// ============ Theme ============
+// تم — بدون تصادفی، فقط انتخابگر
 const savedTheme = localStorage.getItem(STORAGE.theme) || '';
-function applyTheme(t){
-  document.body.className = document.body.className.replace(/theme-\w+|dark/g,'').trim();
-  if(t) document.body.classList.add(t);
-  localStorage.setItem(STORAGE.theme, t);
-  document.querySelectorAll('.theme-opt').forEach(o=>o.classList.toggle('active', o.dataset.theme === t));
-}
+function applyTheme(t){ document.body.className=document.body.className.replace(/theme-\w+/g,'').trim(); if(t) document.body.classList.add(t); localStorage.setItem(STORAGE.theme,t); document.querySelectorAll('.theme-opt').forEach(o=>o.classList.toggle('active',o.dataset.theme===t)); }
 if(savedTheme) applyTheme(savedTheme);
-$('theme-toggle').addEventListener('click', ()=>{ $('theme-picker').classList.toggle('show'); playClick(); });
-document.querySelectorAll('.theme-opt').forEach(o=>{
-  o.addEventListener('click', ()=>{ applyTheme(o.dataset.theme); $('theme-picker').classList.remove('show'); playClick(); });
-});
-document.addEventListener('click', (e)=>{
-  if(!e.target.closest('#theme-picker') && !e.target.closest('#theme-toggle'))
-    $('theme-picker').classList.remove('show');
-});
+$('theme-toggle').addEventListener('click',(e)=>{ e.stopPropagation(); $('theme-picker').classList.toggle('show'); playClick(); });
+document.querySelectorAll('.theme-opt').forEach(o=>{ o.addEventListener('click',(e)=>{ e.stopPropagation(); applyTheme(o.dataset.theme); $('theme-picker').classList.remove('show'); playClick(); }); });
+document.addEventListener('click',(e)=>{ if(!e.target.closest('#theme-picker') && !e.target.closest('#theme-toggle')) $('theme-picker').classList.remove('show'); });
 
-// ============ Reading Mode ============
-let readingMode = localStorage.getItem(STORAGE.reading) === 'on';
-function applyReading(){
-  document.body.classList.toggle('reading', readingMode);
-  $('reading-toggle').classList.toggle('active', readingMode);
-  $('reading-toggle').textContent = readingMode?'📕':'📖';
-}
+// حالت مطالعه
+let readingMode = localStorage.getItem(STORAGE.reading)==='on';
+function applyReading(){ document.body.classList.toggle('reading',readingMode); $('reading-toggle').classList.toggle('active',readingMode); $('reading-toggle').textContent=readingMode?'📕':'📖'; }
 applyReading();
-$('reading-toggle').addEventListener('click', ()=>{
-  readingMode = !readingMode;
-  localStorage.setItem(STORAGE.reading, readingMode?'on':'off');
-  applyReading(); playClick();
-  toast(readingMode?'حالت مطالعه فعال شد':'حالت مطالعه غیرفعال شد');
-});
+$('reading-toggle').addEventListener('click',()=>{ readingMode=!readingMode; localStorage.setItem(STORAGE.reading,readingMode?'on':'off'); applyReading(); playClick(); toast(readingMode?'حالت مطالعه فعال شد':'حالت مطالعه غیرفعال شد'); });
 
-// ============ Progress & Particles ============
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement.scrollHeight - window.innerHeight;
-  const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
-  $('progress-bar').style.width = pct + '%';
-});
+// نوار پیشرفت
+window.addEventListener('scroll',()=>{ const h=document.documentElement.scrollHeight-window.innerHeight; const pct=h>0?(window.scrollY/h)*100:0; $('progress-bar').style.width=pct+'%'; });
 $('progress-bar').classList.add('visible');
 
-// Click particle effect
-const clickCanvas = document.createElement('canvas');
-clickCanvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9998';
-document.body.appendChild(clickCanvas);
-const clickCtx = clickCanvas.getContext('2d');
-let clickParticles = [];
-function resizeClickCanvas(){ clickCanvas.width = innerWidth; clickCanvas.height = innerHeight; }
-resizeClickCanvas(); window.addEventListener('resize', resizeClickCanvas);
-document.addEventListener('click', (e)=>{
-  if(readingMode) return;
-  for(let i=0;i<10;i++){
-    const angle = Math.random()*Math.PI*2;
-    const speed = Math.random()*4+2;
-    clickParticles.push({x:e.clientX, y:e.clientY, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, life:1, color:['#8b5cf6','#06b6d4','#ec4899'][Math.floor(Math.random()*3)]});
-  }
-});
-function animateClickParticles(){
-  clickCtx.clearRect(0,0,clickCanvas.width,clickCanvas.height);
-  clickParticles = clickParticles.filter(p=>p.life>0);
-  clickParticles.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.life-=0.03;
-    clickCtx.globalAlpha = p.life;
-    clickCtx.fillStyle = p.color;
-    clickCtx.beginPath(); clickCtx.arc(p.x,p.y,3,0,Math.PI*2); clickCtx.fill();
-  });
-  clickCtx.globalAlpha = 1;
-  requestAnimationFrame(animateClickParticles);
-}
-animateClickParticles();
-
-// ============ Particles Background ============
-(function(){
-  const canvas = $('particles'); const ctx = canvas.getContext('2d');
-  let W, H; const particles = []; let mouse = {x:-1000,y:-1000};
-  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-  window.addEventListener('resize', resize); resize();
-  window.addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
-  const N = Math.min(50, Math.floor(innerWidth/30));
-  for(let i=0;i<N;i++) particles.push({x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*0.4, vy:(Math.random()-.5)*0.4, r:Math.random()*2+1});
-  function draw(){
-    if(readingMode){ requestAnimationFrame(draw); return; }
-    ctx.clearRect(0,0,W,H);
-    const isDark = !document.body.classList.contains('theme-light');
-    ctx.fillStyle = isDark?'rgba(139,92,246,0.7)':'rgba(139,92,246,0.5)';
-    particles.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>W) p.vx*=-1;
-      if(p.y<0||p.y>H) p.vy*=-1;
-      const dx=p.x-mouse.x, dy=p.y-mouse.y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<120){ p.x+=dx/d*0.6; p.y+=dy/d*0.6; }
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-    });
-    ctx.strokeStyle = isDark?'rgba(139,92,246,0.12)':'rgba(139,92,246,0.08)';
-    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke(); }
-    }
+// ذرات
+(function(){ const canvas=$('particles'),ctx=canvas.getContext('2d'); let W,H; const particles=[]; let mouse={x:-1000,y:-1000};
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; }
+  window.addEventListener('resize',resize); resize();
+  window.addEventListener('mousemove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+  const N=Math.min(45,Math.floor(innerWidth/35));
+  for(let i=0;i<N;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*2+1});
+  function draw(){ if(readingMode){ requestAnimationFrame(draw); return; } ctx.clearRect(0,0,W,H); ctx.fillStyle='rgba(255,255,255,.6)';
+    particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1; const dx=p.x-mouse.x,dy=p.y-mouse.y,d=Math.sqrt(dx*dx+dy*dy); if(d<120){ p.x+=dx/d*.6; p.y+=dy/d*.6; } ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); });
     requestAnimationFrame(draw);
-  }
-  draw();
+  } draw();
 })();
 
-// ============ Three.js Background ============
-let threeLoaded = false;
-function loadThreeJS(){
-  if(threeLoaded || readingMode) return;
-  threeLoaded = true;
-  const script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-  script.onload = init3D;
-  document.head.appendChild(script);
-}
+// ============ Three.js — افکت اتم شیمی ============
+let threeLoaded=false;
+function loadThreeJS(){ if(threeLoaded) return; threeLoaded=true; const script=document.createElement('script'); script.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; script.onload=init3D; document.head.appendChild(script); }
 function init3D(){
-  if(typeof THREE === 'undefined') return;
-  const container = $('three-bg');
-  container.classList.add('visible');
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-  camera.position.z = 6;
-  const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
+  if(typeof THREE==='undefined') return;
+  const container=$('three-bg'); container.classList.add('visible');
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000); camera.position.z=9;
+  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true}); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2)); container.appendChild(renderer.domElement);
 
-  const group = new THREE.Group();
-  const nucleus = new THREE.Mesh(new THREE.SphereGeometry(0.6, 32, 32), new THREE.MeshBasicMaterial({color:0x8b5cf6}));
-  group.add(nucleus);
-  const orbitColors = [0x06b6d4, 0xec4899, 0xf59e0b];
-  for(let i=0;i<3;i++){
-    const orbit = new THREE.Mesh(new THREE.TorusGeometry(2+i*0.4, 0.02, 8, 64), new THREE.MeshBasicMaterial({color:orbitColors[i], transparent:true, opacity:0.4}));
-    orbit.rotation.x = Math.PI/2 + (i-1)*0.5;
-    orbit.rotation.y = (i-1)*0.4;
+  const group=new THREE.Group();
+
+  // هستهٔ اتم — خوشه‌ای از پروتون و نوترون
+  const nucleusGroup=new THREE.Group();
+  const protonPositions=[
+    [0,0,0],[.5,0,0],[-.5,0,0],[0,.5,0],[0,-.5,0],[0,0,.5],[0,0,-.5],
+    [.4,.4,.4],[-.4,-.4,-.4],[.4,-.4,.4],[-.4,.4,-.4]
+  ];
+  protonPositions.forEach((pos,i)=>{
+    const color = i%2===0 ? 0xef4444 : 0x8b5cf6;  // پروتون قرمز، نوترون بنفش
+    const p=new THREE.Mesh(new THREE.SphereGeometry(.2,16,16), new THREE.MeshBasicMaterial({color, transparent:true, opacity:.85}));
+    p.position.set(pos[0],pos[1],pos[2]);
+    nucleusGroup.add(p);
+  });
+  nucleusGroup.scale.set(1.2,1.2,1.2);
+  group.add(nucleusGroup);
+
+  // ۳ مدار الکترونی
+  const orbitData=[
+    {radius:3.0, color:0x06b6d4, tiltX:Math.PI/2, tiltZ:0},
+    {radius:3.6, color:0xec4899, tiltX:Math.PI/2+.6, tiltZ:Math.PI/3},
+    {radius:4.2, color:0xf59e0b, tiltX:Math.PI/2-.6, tiltZ:-Math.PI/3}
+  ];
+  orbitData.forEach((od,i)=>{
+    const orbit=new THREE.Mesh(
+      new THREE.TorusGeometry(od.radius,.02,8,100),
+      new THREE.MeshBasicMaterial({color:od.color, transparent:true, opacity:.5})
+    );
+    orbit.rotation.x=od.tiltX; orbit.rotation.z=od.tiltZ;
     group.add(orbit);
-    const electron = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), new THREE.MeshBasicMaterial({color:orbitColors[i]}));
-    orbit.add(electron);
-    electron.position.x = 2+i*0.4;
-    orbit.userData.electron = electron;
-    orbit.userData.speed = 0.01 + i*0.005;
-  }
+    // الکترون
+    const e=new THREE.Mesh(new THREE.SphereGeometry(.18,16,16), new THREE.MeshBasicMaterial({color:od.color}));
+    e.position.x=od.radius;
+    orbit.add(e);
+    orbit.userData.electron=e;
+    orbit.userData.speed=.015+i*.005;
+  });
+
   scene.add(group);
-
-  let mx = 0, my = 0;
-  window.addEventListener('mousemove', e=>{
-    mx = (e.clientX/innerWidth - .5)*2;
-    my = (e.clientY/innerHeight - .5)*2;
-  });
-  let t = 0;
+  let mx=0,my=0;
+  window.addEventListener('mousemove',e=>{ mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2; });
   function animate(){
-    if(readingMode){ requestAnimationFrame(animate); return; }
-    t += 0.005;
-    group.rotation.y += 0.003 + mx*0.01;
-    group.rotation.x += my*0.005;
-    group.children.forEach((c,i)=>{
-      if(c.userData.electron){ c.rotation.z += c.userData.speed; }
-    });
-    renderer.render(scene, camera);
+    if(readingMode||document.hidden||!$('app-content').classList.contains('active')){ requestAnimationFrame(animate); return; }
+    group.rotation.y+=.004+mx*.01;
+    group.rotation.x+=my*.005;
+    nucleusGroup.rotation.y+=.01;
+    group.children.forEach(c=>{ if(c.userData.electron) c.rotation.z+=c.userData.speed; });
+    renderer.render(scene,camera);
     requestAnimationFrame(animate);
-  }
-  animate();
-  window.addEventListener('resize', ()=>{
-    camera.aspect = innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-  });
+  } animate();
+  window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 }
 
-// ============ Landing & Nav ============
-function enterApp(tabId){
-  playClick();
-  $('landing').classList.add('hidden');
-  $('app-content').classList.add('active');
-  document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
-  const btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
-  if(btn) btn.classList.add('active');
-  const target = $(tabId);
-  if(target) target.classList.add('active');
-  loadThreeJS();
-  if(tabId === 'hardness') renderHardness();
-  if(tabId === 'rockcycle') renderRockCycle();
-  if(tabId === 'timeline') renderTimeline();
-  if(tabId === 'favorites') renderFavorites();
-}
-function goBackToMenu(){
-  $('landing').classList.remove('hidden');
-  $('app-content').classList.remove('active');
-}
-document.querySelectorAll('.nav-btn[data-tab]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    playClick();
-    document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
-    btn.classList.add('active');
-    const t = $(btn.dataset.tab); if(t) t.classList.add('active');
-    if(btn.dataset.tab==='favorites') renderFavorites();
-    if(btn.dataset.tab==='hardness') renderHardness();
-    if(btn.dataset.tab==='rockcycle') renderRockCycle();
-    if(btn.dataset.tab==='timeline') renderTimeline();
-  });
-});
+// ناوبری
+function enterApp(tabId){ playClick(); $('landing').classList.add('hidden'); $('app-content').classList.add('active'); document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active')); const btn=document.querySelector(`.nav-btn[data-tab="${tabId}"]`); if(btn) btn.classList.add('active'); const target=$(tabId); if(target) target.classList.add('active'); loadThreeJS(); if(tabId==='hardness') renderHardness(); if(tabId==='rockcycle') renderRockCycle(); if(tabId==='timeline') renderTimeline(); if(tabId==='favorites') renderFavorites(); }
+function goBackToMenu(){ $('landing').classList.remove('hidden'); $('app-content').classList.remove('active'); }
+document.querySelectorAll('.nav-btn[data-tab]').forEach(btn=>{ btn.addEventListener('click',()=>{ playClick(); document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active')); btn.classList.add('active'); const t=$(btn.dataset.tab); if(t) t.classList.add('active'); if(btn.dataset.tab==='favorites') renderFavorites(); if(btn.dataset.tab==='hardness') renderHardness(); if(btn.dataset.tab==='rockcycle') renderRockCycle(); if(btn.dataset.tab==='timeline') renderTimeline(); }); });
 
-// ============ Modal ============
-const overlay = $('modal-overlay');
-function openModal(html){
-  $('modal-body').innerHTML = html;
-  $('modal-box').classList.remove('fullscreen');
-  overlay.classList.add('open');
-  playClick();
-}
-function closeModal(){
-  overlay.classList.remove('open');
-  $('modal-box').classList.remove('fullscreen');
-}
-function toggleFullscreen(){
-  $('modal-box').classList.toggle('fullscreen');
-}
-overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+// مودال
+const overlay=$('modal-overlay');
+function openModal(html){ $('modal-body').innerHTML=html; overlay.classList.add('open'); playClick(); }
+function closeModal(){ overlay.classList.remove('open'); }
+overlay.addEventListener('click',e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
-// ============ Favorites ============
-function getFavs(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE.fav)||'{"elements":[],"minerals":[],"rocks":[]}'); }
-  catch{ return {elements:[],minerals:[],rocks:[]}; }
-}
-function saveFavs(f){ localStorage.setItem(STORAGE.fav, JSON.stringify(f)); }
-function toggleFav(type, id){
-  const f = getFavs();
-  const arr = f[type];
-  const i = arr.indexOf(id);
-  if(i>=0){ arr.splice(i,1); toast('حذف شد'); }
-  else{ arr.push(id); toast('⭐ اضافه شد'); }
-  saveFavs(f);
-  if(type==='elements') renderPeriodicTable($('element-search').value);
-  if(type==='minerals') renderMinerals($('mineral-search').value);
-  if(type==='rocks') renderRocks($('rock-search').value);
-  if($('favorites').classList.contains('active')) renderFavorites();
-}
+// علاقه‌مندی
+function getFavs(){ try{ return JSON.parse(localStorage.getItem(STORAGE.fav)||'{"elements":[],"minerals":[],"rocks":[]}'); } catch{ return {elements:[],minerals:[],rocks:[]}; } }
+function saveFavs(f){ localStorage.setItem(STORAGE.fav,JSON.stringify(f)); }
+function toggleFav(type,id){ const f=getFavs(); const arr=f[type]; const i=arr.indexOf(id); if(i>=0){ arr.splice(i,1); toast('حذف شد'); } else { arr.push(id); toast('⭐ اضافه شد'); } saveFavs(f); if(type==='elements') renderPeriodicTable($('element-search').value); if(type==='minerals') renderMinerals($('mineral-search').value); if(type==='rocks') renderRocks($('rock-search').value); if($('favorites').classList.contains('active')) renderFavorites(); }
 
-// ============ History ============
-function getHist(type){
-  try{ return JSON.parse(localStorage.getItem(STORAGE.hist+'/'+type)||'[]'); }
-  catch{ return []; }
-}
-function addHist(type, val){
-  if(!val || !val.trim()) return;
-  let h = getHist(type).filter(x=>x!==val);
-  h.unshift(val); h = h.slice(0,6);
-  localStorage.setItem(STORAGE.hist+'/'+type, JSON.stringify(h));
-  renderHistChips(type);
-}
-function renderHistChips(type){
-  const el = $(type+'-history'); if(!el) return;
-  const h = getHist(type);
-  if(!h.length){ el.innerHTML = ''; return; }
-  el.innerHTML = h.map(v=>`<span class="history-chip" onclick="setSearch('${type}','${v.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${v}<span class="x" onclick="event.stopPropagation();removeHist('${type}','${v.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">✕</span></span>`).join('');
-}
-function setSearch(type, val){
-  const input = $(type+'-search');
-  if(input){ input.value = val; input.dispatchEvent(new Event('input')); }
-}
-function removeHist(type, val){
-  let h = getHist(type).filter(x=>x!==val);
-  localStorage.setItem(STORAGE.hist+'/'+type, JSON.stringify(h));
-  renderHistChips(type);
-}
+// تاریخچه
+function getHist(type){ try{ return JSON.parse(localStorage.getItem(STORAGE.hist+'/'+type)||'[]'); } catch{ return []; } }
+function addHist(type,val){ if(!val||!val.trim()) return; let h=getHist(type).filter(x=>x!==val); h.unshift(val); h=h.slice(0,6); localStorage.setItem(STORAGE.hist+'/'+type,JSON.stringify(h)); renderHistChips(type); }
+function renderHistChips(type){ const el=$(type+'-history'); if(!el) return; const h=getHist(type); if(!h.length){ el.innerHTML=''; return; } el.innerHTML=h.map(v=>`<span class="history-chip" onclick="setSearch('${type}','${v.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${v}</span>`).join(''); }
+function setSearch(type,val){ const input=$(type+'-search'); if(input){ input.value=val; input.dispatchEvent(new Event('input')); } }
 
-// ============ Fuzzy ============
-function levenshtein(a,b){
-  if(!a.length) return b.length; if(!b.length) return a.length;
-  const m=[]; for(let i=0;i<=b.length;i++) m[i]=[i];
-  for(let j=0;j<=a.length;j++) m[0][j]=j;
-  for(let i=1;i<=b.length;i++) for(let j=1;j<=a.length;j++)
-    m[i][j] = b[i-1]===a[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j-1],m[i-1][j],m[i][j-1])+1;
-  return m[b.length][a.length];
-}
-function fuzzyMatch(text, q){
-  if(!q) return true;
-  text = String(text).toLowerCase(); q = q.toLowerCase();
-  if(text.includes(q)) return true;
-  if(q.length < 3) return false;
-  const words = text.split(/[\s،.\-()]+/);
-  return words.some(w => levenshtein(w, q) <= Math.max(1, Math.floor(q.length/3)));
-}
+// فازی
+function levenshtein(a,b){ if(!a.length) return b.length; if(!b.length) return a.length; const m=[]; for(let i=0;i<=b.length;i++) m[i]=[i]; for(let j=0;j<=a.length;j++) m[0][j]=j; for(let i=1;i<=b.length;i++) for(let j=1;j<=a.length;j++) m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:Math.min(m[i-1][j-1],m[i-1][j],m[i][j-1])+1; return m[b.length][a.length]; }
+function fuzzyMatch(text,q){ if(!q) return true; text=String(text).toLowerCase(); q=q.toLowerCase(); if(text.includes(q)) return true; if(q.length<3) return false; const words=text.split(/[\s،.\-()]+/); return words.some(w=>levenshtein(w,q)<=Math.max(1,Math.floor(q.length/3))); }
 
-// ============ Voice ============
-function setupVoice(btnId, inputId, type){
-  const btn = $(btnId); if(!btn) return;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ btn.style.display='none'; return; }
-  const rec = new SR(); rec.lang='fa-IR'; rec.continuous=false; rec.interimResults=false;
-  let active = false;
-  btn.addEventListener('click', ()=>{
-    if(active){ rec.stop(); return; }
-    try{ rec.start(); active=true; btn.classList.add('recording'); toast('🎤 صحبت کنید...'); }
-    catch(e){ toast('خطا'); }
-  });
-  rec.onresult = e=>{
-    const t = e.results[0][0].transcript;
-    const input = $(inputId); input.value = t; input.dispatchEvent(new Event('input'));
-    addHist(type, t); active=false; btn.classList.remove('recording');
-    toast('شنیده شد: '+t);
-  };
-  rec.onerror = ()=>{ active=false; btn.classList.remove('recording'); };
-  rec.onend = ()=>{ active=false; btn.classList.remove('recording'); };
-}
+// صوتی
+function setupVoice(btnId,inputId,type){ const btn=$(btnId); if(!btn) return; const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ btn.style.display='none'; return; } const rec=new SR(); rec.lang='fa-IR'; rec.continuous=false; rec.interimResults=false; let active=false; btn.addEventListener('click',()=>{ if(active){ rec.stop(); return; } try{ rec.start(); active=true; btn.classList.add('recording'); toast('🎤 صحبت کنید...'); }catch(e){} }); rec.onresult=e=>{ const t=e.results[0][0].transcript; const input=$(inputId); input.value=t; input.dispatchEvent(new Event('input')); addHist(type,t); active=false; btn.classList.remove('recording'); toast('شنیده شد: '+t); }; rec.onerror=()=>{ active=false; btn.classList.remove('recording'); }; rec.onend=()=>{ active=false; btn.classList.remove('recording'); }; }
 
-// ============ Periodic table ============
-// ============ Periodic table (Optimized) ============
+// جدول مندلیف (بهینه)
 function renderPeriodicTable(filter=''){
-  const mainGrid = $('periodic-main'), lanthGrid = $('periodic-lanth');
-  const q = filter.trim();
-  const lanth = elementsData.filter(e=>e.category==='لانتانید');
-  const act = elementsData.filter(e=>e.category==='اکتینید');
-  const main = elementsData.filter(e=>e.category!=='لانتانید'&&e.category!=='اکتینید');
-  
-  // ساخت نقشه برای جستجوی سریع به جای حلقه find
-  const mainMap = {};
-  main.forEach(el => { mainMap[`${el.period}-${el.group}`] = el; });
-  
-  let mainHtml = '';
-  for(let p=1;p<=7;p++){
-    for(let g=1;g<=18;g++){
-      const el = mainMap[`${p}-${g}`];
-      if(el){
-        const dim = q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q) && !String(el.number).includes(q);
-        mainHtml += `<div class="element-cell blk-${el.block}" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`;
-      } else {
-        mainHtml += `<div class="element-cell" style="opacity:.06"></div>`;
-      }
-    }
-  }
-  mainGrid.innerHTML = mainHtml;
-  
-  let lanthHtml = '';
-  lanth.concat(act).forEach(el => {
-    const dim = q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q);
-    lanthHtml += `<div class="element-cell blk-f" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`;
-  });
-  lanthGrid.innerHTML = lanthHtml;
+  const mainGrid=$('periodic-main'), lanthGrid=$('periodic-lanth');
+  const q=filter.trim();
+  const lanth=elementsData.filter(e=>e.category==='لانتانید');
+  const act=elementsData.filter(e=>e.category==='اکتینید');
+  const main=elementsData.filter(e=>e.category!=='لانتانید'&&e.category!=='اکتینید');
+  const mainMap={};
+  main.forEach(el=>{ mainMap[`${el.period}-${el.group}`]=el; });
+  let mainHtml='';
+  for(let p=1;p<=7;p++){ for(let g=1;g<=18;g++){ const el=mainMap[`${p}-${g}`]; if(el){ const dim=q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q) && !String(el.number).includes(q); mainHtml+=`<div class="element-cell blk-${el.block}" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`; } else { mainHtml+='<div class="element-cell" style="opacity:.06"></div>'; } } }
+  mainGrid.innerHTML=mainHtml;
+  let lanthHtml='';
+  lanth.concat(act).forEach(el=>{ const dim=q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q); lanthHtml+=`<div class="element-cell blk-f" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`; });
+  lanthGrid.innerHTML=lanthHtml;
 }
+(function setupPeriodicDelegation(){ const handler=(e)=>{ const cell=e.target.closest('.element-cell'); if(!cell||!cell.dataset.num) return; const el=elementsData.find(x=>x.number===parseInt(cell.dataset.num)); if(el) showElement(el); }; document.getElementById('periodic-main').addEventListener('click',handler); document.getElementById('periodic-lanth').addEventListener('click',handler); })();
 
-// Event Delegation - تعریف فقط یک بار در بیرون از تابع (باید در اسکریپت قرار بگیرد)
-(function setupPeriodicDelegation() {
-  const handler = (e) => {
-    const cell = e.target.closest('.element-cell');
-    if (!cell || !cell.dataset.num) return;
-    const el = elementsData.find(x => x.number === parseInt(cell.dataset.num));
-    if (el) showElement(el);
-  };
-  document.getElementById('periodic-main').addEventListener('click', handler);
-  document.getElementById('periodic-lanth').addEventListener('click', handler);
-})();
+function atomicSVG(el){ const Z=el.number, A=Math.round(el.mass), neutrons=A-Z; const shellCaps=[2,8,18,32,32,18,8]; let remaining=Z; const shells=[]; for(const cap of shellCaps){ if(remaining<=0) break; const n=Math.min(remaining,cap); shells.push(n); remaining-=n; } const size=280,cx=size/2,cy=size/2,maxR=120; let svg=`<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:280px;">`; shells.forEach((eCount,i)=>{ const r=25+(i+1)*((maxR-25)/shells.length); svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(139,92,246,.35)" stroke-width="1.2"/>`; for(let j=0;j<eCount;j++){ const angle=(j/eCount)*Math.PI*2-Math.PI/2; const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r; svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#06b6d4"/>`; } }); svg+=`<circle cx="${cx}" cy="${cy}" r="22" fill="url(#nucleusGrad)"/>`; svg+=`<defs><radialGradient id="nucleusGrad"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7c3aed"/></radialGradient></defs>`; svg+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" fill="white" font-size="14" font-weight="bold">${Z}</text>`; svg+=`<text x="${cx}" y="${cy+36}" text-anchor="middle" fill="var(--text-muted)" font-size="9">p⁺:${Z} n⁰:${neutrons}</text>`; svg+='</svg>'; return svg; }
+function rarityStars(r){ const n=parseInt(r)||5; return '★'.repeat(n)+'☆'.repeat(10-n); }
 
-function atomicSVG(el){
-  const Z = el.number, A = Math.round(el.mass);
-  const neutrons = A - Z;
-  const shellCaps = [2,8,18,32,32,18,8];
-  let remaining = Z;
-  const shells = [];
-  for(const cap of shellCaps){ if(remaining<=0) break; const n=Math.min(remaining,cap); shells.push(n); remaining-=n; }
-  const size = 280, cx = size/2, cy = size/2, maxR = 120;
-  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:280px;">`;
-  shells.forEach((eCount, i)=>{
-    const r = 25 + (i+1)*((maxR-25)/shells.length);
-    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(139,92,246,.35)" stroke-width="1.2"/>`;
-    for(let j=0;j<eCount;j++){
-      const angle = (j/eCount)*Math.PI*2 - Math.PI/2;
-      const x = cx + Math.cos(angle)*r, y = cy + Math.sin(angle)*r;
-      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#06b6d4"/>`;
-    }
-  });
-  svg += `<circle cx="${cx}" cy="${cy}" r="22" fill="url(#nucleusGrad)"/>`;
-  svg += `<defs><radialGradient id="nucleusGrad"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7c3aed"/></radialGradient></defs>`;
-  svg += `<text x="${cx}" y="${cy+5}" text-anchor="middle" fill="white" font-size="14" font-weight="bold">${Z}</text>`;
-  svg += `<text x="${cx}" y="${cy+36}" text-anchor="middle" fill="var(--text-muted)" font-size="9">p⁺:${Z} n⁰:${neutrons}</text>`;
-  svg += '</svg>';
-  return svg;
-}
-function rarityStars(r){
-  const n = parseInt(r)||5;
-  return '★'.repeat(n) + '☆'.repeat(10-n);
-}
+function showElement(el){ const favs=getFavs(), isFav=favs.elements.includes(el.number); const radiusPct=Math.min(100,(parseFloat(el.radius)||0)/3), ionPct=Math.min(100,(parseFloat(el.ion)||0)*4), enPct=Math.min(100,(parseFloat(el.en)||0)*25);
+  openModal(`<h2>⚛️ ${el.name} (${el.symbol})</h2><div class="modal-tools"><button onclick="toggleFav('elements',${el.number});closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button><button onclick="addToCompare('element',${el.number})">⚖️ مقایسه</button><button onclick="shareLink('elements/${el.symbol}')">🔗 اشتراک</button><button onclick="window.print()">🖨️ چاپ</button></div><div class="atom-svg">${atomicSVG(el)}</div><div class="detail-row"><span class="label">🔢 عدد اتمی</span><span class="value">${el.number}</span></div><div class="detail-row"><span class="label">⚖️ جرم اتمی</span><span class="value">${el.mass} u</span></div><div class="detail-row"><span class="label">📂 دسته</span><span class="value">${el.category}</span></div><div class="detail-row"><span class="label">📊 دوره/گروه/بلوک</span><span class="value">${el.period}/${el.group}/${el.block}</span></div><div class="detail-row"><span class="label">🔬 پیکربندی</span><span class="value">${el.config}</span></div><div class="detail-row"><span class="label">🌡️ نقطه ذوب</span><span class="value">${el.melting}°C</span></div><div class="detail-row"><span class="label">💧 چگالی</span><span class="value">${el.density} g/cm³</span></div><div class="detail-row"><span class="label">🧬 ایزوتوپ‌ها</span><span class="value">${el.isotopes}</span></div><div class="detail-row"><span class="label">📖 ریشه‌شناسی</span><span class="value uses">${el.etymology}</span></div><div class="detail-row"><span class="label">📍 محل اصلی</span><span class="value uses">${el.location}</span></div><div class="detail-row"><span class="label">💰 قیمت</span><span class="value">${el.price}</span></div><div class="detail-row"><span class="label">💎 کمیابی</span><span class="value"><span class="rarity-stars">${rarityStars(el.rarity)}</span></span></div><div class="detail-row"><span class="label">👤 کاشف</span><span class="value">${el.discoverer}</span></div><div class="detail-row"><span class="label">📅 سال کشف</span><span class="value">${el.year}</span></div><div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${el.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div><p class="desc">${el.summary}</p><div class="trend-bar-container"><h4>📊 روندهای تناوبی</h4><div class="trend-label"><span>شعاع اتمی</span><span>${el.radius} pm</span></div><div class="trend-bar"><div class="trend-bar-fill" style="width:${radiusPct}%"></div></div><div class="trend-label"><span>الکترونگاتیوی</span><span>${el.en}</span></div><div class="trend-bar"><div class="trend-bar-fill" style="width:${enPct}%;background:linear-gradient(90deg,var(--accent2),var(--accent3))"></div></div><div class="trend-label"><span>انرژی یونیزاسیون</span><span>${el.ion} eV</span></div><div class="trend-bar"><div class="trend-bar-fill" style="width:${ionPct}%;background:linear-gradient(90deg,#f59e0b,var(--accent3))"></div></div></div>`); }
+function formulaClickable(formula){ return String(formula).replace(/([A-Z][a-z]?)/g,(match)=>{ const el=elementsData.find(e=>e.symbol===match); if(el) return `<span class="formula-click" onclick="showElementBySymbol('${match}')">${match}</span>`; return match; }); }
+function showElementBySymbol(sym){ const el=elementsData.find(e=>e.symbol===sym); if(el) showElement(el); }
 
-function showElement(el){
-  const favs = getFavs();
-  const isFav = favs.elements.includes(el.number);
-  const radiusPct = Math.min(100, (parseFloat(el.radius)||0)/3);
-  const ionPct = Math.min(100, (parseFloat(el.ion)||0)*4);
-  const enPct = Math.min(100, (parseFloat(el.en)||0)*25);
-  openModal(`
-    <h2>⚛️ ${el.name} (${el.symbol})</h2>
-    <div class="modal-tools">
-      <button onclick="toggleFav('elements',${el.number});closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button>
-      <button onclick="addToCompare('element',${el.number})">⚖️ مقایسه</button>
-      <button onclick="shareLink('elements/${el.symbol}')">🔗 اشتراک</button>
-      <button onclick="toggleFullscreen()">⛶ تمام‌صفحه</button>
-      <button onclick="window.print()">🖨️ چاپ</button>
-    </div>
-    <div class="atom-svg">${atomicSVG(el)}</div>
-    <div class="detail-row"><span class="label">🔢 عدد اتمی</span><span class="value">${el.number}</span></div>
-    <div class="detail-row"><span class="label">⚖️ جرم اتمی</span><span class="value">${el.mass} u</span></div>
-    <div class="detail-row"><span class="label">📂 دسته</span><span class="value">${el.category}</span></div>
-    <div class="detail-row"><span class="label">📊 دوره/گروه/بلوک</span><span class="value">${el.period}/${el.group}/${el.block}</span></div>
-    <div class="detail-row"><span class="label">🔬 پیکربندی</span><span class="value">${el.config}</span></div>
-    <div class="detail-row"><span class="label">🌡️ نقطه ذوب</span><span class="value">${el.melting}°C</span></div>
-    <div class="detail-row"><span class="label">💧 چگالی</span><span class="value">${el.density} g/cm³</span></div>
-    <div class="detail-row"><span class="label">🧬 ایزوتوپ‌ها</span><span class="value">${el.isotopes}</span></div>
-    <div class="detail-row"><span class="label">📖 ریشه‌شناسی</span><span class="value uses">${el.etymology}</span></div>
-    <div class="detail-row"><span class="label">📍 محل اصلی</span><span class="value uses">${el.location}</span></div>
-    <div class="detail-row"><span class="label">💰 قیمت تقریبی</span><span class="value">${el.price}</span></div>
-    <div class="detail-row"><span class="label">💎 کمیابی</span><span class="value"><span class="rarity-stars">${rarityStars(el.rarity)}</span></span></div>
-    <div class="detail-row"><span class="label">👤 کاشف</span><span class="value">${el.discoverer}</span></div>
-    <div class="detail-row"><span class="label">📅 سال کشف</span><span class="value">${el.year}</span></div>
-    <div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${el.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div>
-    <p class="desc">${el.summary}</p>
-    <div class="trend-bar-container">
-      <h4>📊 روندهای تناوبی</h4>
-      <div class="trend-label"><span>شعاع اتمی</span><span>${el.radius} pm</span></div>
-      <div class="trend-bar"><div class="trend-bar-fill" style="width:${radiusPct}%"></div></div>
-      <div class="trend-label"><span>الکترونگاتیوی</span><span>${el.en}</span></div>
-      <div class="trend-bar"><div class="trend-bar-fill" style="width:${enPct}%;background:linear-gradient(90deg,var(--accent2),var(--accent3))"></div></div>
-      <div class="trend-label"><span>انرژی یونیزاسیون</span><span>${el.ion} eV</span></div>
-      <div class="trend-bar"><div class="trend-bar-fill" style="width:${ionPct}%;background:linear-gradient(90deg,#f59e0b,var(--accent3))"></div></div>
-    </div>
-  `);
-}
-function formulaClickable(formula){
-  return String(formula).replace(/([A-Z][a-z]?)/g, (match)=>{
-    const el = elementsData.find(e=>e.symbol===match);
-    if(el) return `<span class="formula-click" onclick="showElementBySymbol('${match}')">${match}</span>`;
-    return match;
-  });
-}
-function showElementBySymbol(sym){
-  const el = elementsData.find(e=>e.symbol===sym);
-  if(el) showElement(el);
-}
-
-// ============ Minerals ============
+// کانی‌ها
 let mineralCat='همه', mineralHardMin=0, mineralHardMax=10, mineralCountry='همه';
+function parseHardness(h){ const trans={'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'}; let s=String(h).replace(/[۰-۹]/g,d=>trans[d]); const m=s.match(/[\d.]+/); return m?parseFloat(m[0]):0; }
+function renderMineralSidebar(){ const sb=$('mineral-sidebar'); const cats={}; mineralsData.forEach(m=>{ if(!cats[m.category]) cats[m.category]=0; cats[m.category]++; }); const countries=new Set(); mineralsData.forEach(m=>m.countries.forEach(c=>{ if(c && c!=='نامشخص') countries.add(c); })); let html='<h3>💠 رده‌ها</h3>'; html+=`<div class="sidebar-item ${mineralCat==='همه'?'active':''}" onclick="setMineralCat('همه')"><span>همه</span><span class="count">${mineralsData.length}</span></div>`; Object.entries(cats).forEach(([cat,n])=>{ html+=`<div class="sidebar-item ${mineralCat===cat?'active':''}" onclick="setMineralCat('${cat}')"><span>${cat}</span><span class="count">${n}</span></div>`; }); html+='<h3>🌍 کشور</h3>'; html+=`<div class="sidebar-item ${mineralCountry==='همه'?'active':''}" onclick="setMineralCountry('همه')"><span>همه</span></div>`; html+=`<div class="sidebar-item ${mineralCountry==='ایران'?'active':''}" onclick="setMineralCountry('ایران')"><span>🇮🇷 ایران</span><span class="count">${mineralsData.filter(m=>m.countries.includes('ایران')).length}</span></div>`; Array.from(countries).filter(c=>c!=='ایران').slice(0,10).forEach(c=>{ html+=`<div class="sidebar-item ${mineralCountry===c?'active':''}" onclick="setMineralCountry('${c.replace(/'/g,"\\\\'")}')"><span>${c}</span><span class="count">${mineralsData.filter(m=>m.countries.includes(c)).length}</span></div>`; }); html+=`<div class="filter-panel"><label>سختی: <span id="hard-label">${mineralHardMin} - ${mineralHardMax}</span></label><input type="range" min="0" max="10" step="0.5" value="${mineralHardMin}" id="hard-min"><input type="range" min="0" max="10" step="0.5" value="${mineralHardMax}" id="hard-max"></div><button class="reset-btn" onclick="resetMineralFilters()">🗑️ پاک کردن همه فیلترها</button>`; sb.innerHTML=html; $('hard-min').addEventListener('input',e=>{ mineralHardMin=parseFloat(e.target.value); $('hard-label').textContent=`${mineralHardMin} - ${mineralHardMax}`; renderMinerals($('mineral-search').value); }); $('hard-max').addEventListener('input',e=>{ mineralHardMax=parseFloat(e.target.value); $('hard-label').textContent=`${mineralHardMin} - ${mineralHardMax}`; renderMinerals($('mineral-search').value); }); }
+function setMineralCat(cat){ mineralCat=cat; if(cat==='همه'){ mineralHardMin=0; mineralHardMax=10; } renderMineralSidebar(); renderMinerals($('mineral-search').value); }
+function setMineralCountry(c){ mineralCountry=c; renderMineralSidebar(); renderMinerals($('mineral-search').value); }
+function resetMineralFilters(){ mineralCat='همه'; mineralHardMin=0; mineralHardMax=10; mineralCountry='همه'; $('mineral-search').value=''; renderMineralSidebar(); renderMinerals(''); toast('فیلترها پاک شد'); }
+function renderMinerals(filter=''){ const grid=$('minerals-grid'); const q=(filter!==undefined?filter:$('mineral-search').value).trim(); const favs=getFavs(); let list=mineralsData; if(mineralCat!=='همه') list=list.filter(m=>m.category===mineralCat); if(mineralCountry!=='همه') list=list.filter(m=>m.countries.includes(mineralCountry)); list=list.filter(m=>{ const h=parseHardness(m.hardness); return h>=mineralHardMin && h<=mineralHardMax; }); if(q) list=list.filter(m=>fuzzyMatch(m.name,q)||fuzzyMatch(m.formula,q)||fuzzyMatch(m.category,q)); if(!list.length){ grid.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:30px;column-span:all">کانی‌ای یافت نشد.</p>'; return; } grid.innerHTML=list.map((m,i)=>{ const isFav=favs.minerals.includes(m.name); return `<div class="card" style="animation-delay:${Math.min(i*.005,.4)}s" onclick="showMineral('${m.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><div class="card-actions"><button class="action-btn ${isFav?'fav':''}" onclick="event.stopPropagation();toggleFav('minerals','${m.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${isFav?'★':'☆'}</button></div><h3>💎 ${m.name}</h3><div class="card-meta"><span class="tag">${m.formula}</span><span class="tag tag-cyan">سختی ${m.hardness}</span><span class="tag tag-pink">${m.category}</span></div><p>${m.description}</p></div>`; }).join(''); applyTiltAll(grid); }
+function showMineral(name){ const m=mineralsData.find(x=>x.name===name); if(!m) return; const favs=getFavs(), isFav=favs.minerals.includes(name); openModal(`<h2>💎 ${m.name}</h2><div class="modal-tools"><button onclick="toggleFav('minerals','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}');closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button><button onclick="addToCompare('mineral','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">⚖️ مقایسه</button><button onclick="shareLink('minerals/${encodeURIComponent(name)}')">🔗 اشتراک</button><button onclick="window.print()">🖨️ چاپ</button></div><div class="detail-row"><span class="label">🧪 فرمول</span><span class="value">${formulaClickable(m.formula)}</span></div><div class="detail-row"><span class="label">📂 رده</span><span class="value">${m.category}</span></div><div class="detail-row"><span class="label">🪨 سختی</span><span class="value">${m.hardness}</span></div><div class="detail-row"><span class="label">🎨 رنگ</span><span class="value">${m.color}</span></div><div class="detail-row"><span class="label">📍 محل</span><span class="value uses">${m.location}</span></div><div class="detail-row"><span class="label">💰 قیمت</span><span class="value">${m.price}</span></div><div class="detail-row"><span class="label">💎 کمیابی</span><span class="value"><span class="rarity-stars">${rarityStars(m.rarity)}</span></span></div><div class="detail-row"><span class="label">🔗 کانی همراه</span><span class="value uses">${m.associated}</span></div><div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${m.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div><p class="desc">${m.description}</p>`); }
 
-function parseHardness(h){
-  const trans = {'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'};
-  let s = String(h).replace(/[۰-۹]/g, d=>trans[d]);
-  const m = s.match(/[\d.]+/);
-  return m ? parseFloat(m[0]) : 0;
-}
-
-function renderMineralSidebar(){
-  const sb = $('mineral-sidebar');
-  const cats = {};
-  mineralsData.forEach(m=>{
-    if(!cats[m.category]) cats[m.category] = 0;
-    cats[m.category]++;
-  });
-  const countries = new Set();
-  mineralsData.forEach(m=>m.countries.forEach(c=>{ if(c && c!=='نامشخص') countries.add(c); }));
-  let html = '<h3>💠 رده‌ها</h3>';
-  html += `<div class="sidebar-item ${mineralCat==='همه'?'active':''}" onclick="setMineralCat('همه')"><span>همه</span><span class="count">${mineralsData.length}</span></div>`;
-  Object.entries(cats).forEach(([cat, n])=>{
-    html += `<div class="sidebar-item ${mineralCat===cat?'active':''}" onclick="setMineralCat('${cat}')"><span>${cat}</span><span class="count">${n}</span></div>`;
-  });
-  html += `<h3>🌍 کشور</h3>`;
-  html += `<div class="sidebar-item ${mineralCountry==='همه'?'active':''}" onclick="setMineralCountry('همه')"><span>همه</span></div>`;
-  html += `<div class="sidebar-item ${mineralCountry==='ایران'?'active':''}" onclick="setMineralCountry('ایران')"><span>🇮🇷 ایران</span><span class="count">${mineralsData.filter(m=>m.countries.includes('ایران')).length}</span></div>`;
-  Array.from(countries).filter(c=>c!=='ایران').slice(0,10).forEach(c=>{
-    html += `<div class="sidebar-item ${mineralCountry===c?'active':''}" onclick="setMineralCountry('${c.replace(/'/g,"\\\\'")}')"><span>${c}</span><span class="count">${mineralsData.filter(m=>m.countries.includes(c)).length}</span></div>`;
-  });
-  html += `<div class="filter-panel">
-    <label>سختی: <span id="hard-label">${mineralHardMin} - ${mineralHardMax}</span></label>
-    <input type="range" min="0" max="10" step="0.5" value="${mineralHardMin}" id="hard-min">
-    <input type="range" min="0" max="10" step="0.5" value="${mineralHardMax}" id="hard-max">
-  </div>
-  <button class="reset-btn" onclick="resetMineralFilters()">🗑️ پاک کردن همه فیلترها</button>`;
-  sb.innerHTML = html;
-  
-  $('hard-min').addEventListener('input', e=>{
-    mineralHardMin = parseFloat(e.target.value);
-    $('hard-label').textContent = `${mineralHardMin} - ${mineralHardMax}`;
-    renderMinerals($('mineral-search').value);
-  });
-  $('hard-max').addEventListener('input', e=>{
-    mineralHardMax = parseFloat(e.target.value);
-    $('hard-label').textContent = `${mineralHardMin} - ${mineralHardMax}`;
-    renderMinerals($('mineral-search').value);
-  });
-}
-function setMineralCat(cat){
-  mineralCat = cat;
-  if(cat === 'همه'){ mineralHardMin = 0; mineralHardMax = 10; }
-  renderMineralSidebar();
-  renderMinerals($('mineral-search').value);
-}
-function setMineralCountry(c){
-  mineralCountry = c;
-  renderMineralSidebar();
-  renderMinerals($('mineral-search').value);
-}
-function resetMineralFilters(){
-  mineralCat = 'همه';
-  mineralHardMin = 0;
-  mineralHardMax = 10;
-  mineralCountry = 'همه';
-  $('mineral-search').value = '';
-  renderMineralSidebar();
-  renderMinerals('');
-  toast('فیلترها پاک شد');
-}
-function renderMinerals(filter=''){
-  const grid = $('minerals-grid');
-  const q = (filter !== undefined ? filter : $('mineral-search').value).trim();
-  const favs = getFavs();
-  let list = mineralsData;
-  if(mineralCat !== 'همه') list = list.filter(m=>m.category===mineralCat);
-  if(mineralCountry !== 'همه') list = list.filter(m=>m.countries.includes(mineralCountry));
-  list = list.filter(m=>{
-    const h = parseHardness(m.hardness);
-    return h >= mineralHardMin && h <= mineralHardMax;
-  });
-  if(q) list = list.filter(m=>fuzzyMatch(m.name,q)||fuzzyMatch(m.formula,q)||fuzzyMatch(m.category,q));
-  
-  if(!list.length){
-    grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:30px">کانی‌ای یافت نشد.</p>';
-    return;
-  }
-  grid.innerHTML = list.map((m,i)=>{
-    const isFav = favs.minerals.includes(m.name);
-    return `<div class="card" style="animation-delay:${Math.min(i*.005,.4)}s" onclick="showMineral('${m.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">
-      <div class="card-actions">
-        <button class="action-btn ${isFav?'fav':''}" onclick="event.stopPropagation();toggleFav('minerals','${m.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${isFav?'★':'☆'}</button>
-      </div>
-      <h3>💎 ${m.name}</h3>
-      <div class="card-meta"><span class="tag">${m.formula}</span><span class="tag tag-cyan">سختی ${m.hardness}</span><span class="tag tag-pink">${m.category}</span></div>
-      <p>${m.description}</p>
-    </div>`;
-  }).join('');
-}
-function showMineral(name){
-  const m = mineralsData.find(x=>x.name===name); if(!m) return;
-  const favs = getFavs();
-  const isFav = favs.minerals.includes(name);
-  openModal(`
-    <h2>💎 ${m.name}</h2>
-    <div class="modal-tools">
-      <button onclick="toggleFav('minerals','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}');closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button>
-      <button onclick="addToCompare('mineral','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">⚖️ مقایسه</button>
-      <button onclick="shareLink('minerals/${encodeURIComponent(name)}')">🔗 اشتراک</button>
-      <button onclick="toggleFullscreen()">⛶ تمام‌صفحه</button>
-      <button onclick="window.print()">🖨️ چاپ</button>
-    </div>
-    <div class="detail-row"><span class="label">🧪 فرمول</span><span class="value">${formulaClickable(m.formula)}</span></div>
-    <div class="detail-row"><span class="label">📂 رده</span><span class="value">${m.category}</span></div>
-    <div class="detail-row"><span class="label">🪨 سختی</span><span class="value">${m.hardness}</span></div>
-    <div class="detail-row"><span class="label">🎨 رنگ</span><span class="value">${m.color}</span></div>
-    <div class="detail-row"><span class="label">📍 محل</span><span class="value uses">${m.location}</span></div>
-    <div class="detail-row"><span class="label">💰 قیمت</span><span class="value">${m.price}</span></div>
-    <div class="detail-row"><span class="label">💎 کمیابی</span><span class="value"><span class="rarity-stars">${rarityStars(m.rarity)}</span></span></div>
-    <div class="detail-row"><span class="label">🔗 کانی همراه</span><span class="value uses">${m.associated}</span></div>
-    <div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${m.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div>
-    <p class="desc">${m.description}</p>
-  `);
-}
-
-// ============ Rocks ============
+// سنگ‌ها
 let rockType='همه';
-function renderRockSidebar(){
-  const sb = $('rock-sidebar');
-  const types = {};
-  rocksData.forEach(r=>{
-    if(!types[r.type]) types[r.type] = 0;
-    types[r.type]++;
-  });
-  let html = '<h3>🏔️ گروه‌ها</h3>';
-  html += `<div class="sidebar-item ${rockType==='همه'?'active':''}" onclick="setRockType('همه')"><span>همه</span><span class="count">${rocksData.length}</span></div>`;
-  Object.entries(types).forEach(([t, n])=>{
-    html += `<div class="sidebar-item ${rockType===t?'active':''}" onclick="setRockType('${t}')"><span>${t}</span><span class="count">${n}</span></div>`;
-  });
-  html += `<button class="reset-btn" onclick="resetRockFilters()">🗑️ پاک کردن فیلترها</button>`;
-  sb.innerHTML = html;
-}
+function renderRockSidebar(){ const sb=$('rock-sidebar'); const types={}; rocksData.forEach(r=>{ if(!types[r.type]) types[r.type]=0; types[r.type]++; }); let html='<h3>🏔️ گروه‌ها</h3>'; html+=`<div class="sidebar-item ${rockType==='همه'?'active':''}" onclick="setRockType('همه')"><span>همه</span><span class="count">${rocksData.length}</span></div>`; Object.entries(types).forEach(([t,n])=>{ html+=`<div class="sidebar-item ${rockType===t?'active':''}" onclick="setRockType('${t}')"><span>${t}</span><span class="count">${n}</span></div>`; }); html+=`<button class="reset-btn" onclick="resetRockFilters()">🗑️ پاک کردن فیلترها</button>`; sb.innerHTML=html; }
 function setRockType(t){ rockType=t; renderRockSidebar(); renderRocks($('rock-search').value); }
 function resetRockFilters(){ rockType='همه'; $('rock-search').value=''; renderRockSidebar(); renderRocks(''); toast('فیلترها پاک شد'); }
-function renderRocks(filter=''){
-  const grid = $('rocks-grid');
-  const q = (filter !== undefined ? filter : $('rock-search').value).trim();
-  const favs = getFavs();
-  let list = rocksData;
-  if(rockType !== 'همه') list = list.filter(r=>r.type===rockType);
-  if(q) list = list.filter(r=>fuzzyMatch(r.name,q)||fuzzyMatch(r.type,q)||fuzzyMatch(r.subtype,q));
-  
-  if(!list.length){
-    grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:30px">سنگی یافت نشد.</p>';
-    return;
-  }
-  grid.innerHTML = list.map((r,i)=>{
-    const isFav = favs.rocks.includes(r.name);
-    return `<div class="card" style="animation-delay:${Math.min(i*.005,.4)}s" onclick="showRock('${r.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">
-      <div class="card-actions">
-        <button class="action-btn ${isFav?'fav':''}" onclick="event.stopPropagation();toggleFav('rocks','${r.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${isFav?'★':'☆'}</button>
-      </div>
-      <h3>🪨 ${r.name}</h3>
-      <div class="card-meta"><span class="tag">${r.type}</span><span class="tag tag-cyan">${r.subtype}</span><span class="tag tag-pink">${r.texture}</span></div>
-      <p>${r.description}</p>
-    </div>`;
-  }).join('');
-}
-function showRock(name){
-  const r = rocksData.find(x=>x.name===name); if(!r) return;
-  const favs = getFavs();
-  const isFav = favs.rocks.includes(name);
-  openModal(`
-    <h2>🪨 ${r.name}</h2>
-    <div class="modal-tools">
-      <button onclick="toggleFav('rocks','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}');closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button>
-      <button onclick="addToCompare('rock','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">⚖️ مقایسه</button>
-      <button onclick="shareLink('rocks/${encodeURIComponent(name)}')">🔗 اشتراک</button>
-      <button onclick="toggleFullscreen()">⛶ تمام‌صفحه</button>
-      <button onclick="window.print()">🖨️ چاپ</button>
-    </div>
-    <div class="detail-row"><span class="label">🏔️ نوع</span><span class="value">${r.type}</span></div>
-    <div class="detail-row"><span class="label">🔬 زیرگروه</span><span class="value">${r.subtype}</span></div>
-    <div class="detail-row"><span class="label">🧪 ترکیب</span><span class="value">${r.composition}</span></div>
-    <div class="detail-row"><span class="label">🔍 بافت</span><span class="value">${r.texture}</span></div>
-    <div class="detail-row"><span class="label">🎨 رنگ</span><span class="value">${r.color}</span></div>
-    <div class="detail-row"><span class="label">📍 محل</span><span class="value uses">${r.location}</span></div>
-    <div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${r.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div>
-    <p class="desc">${r.description}</p>
-  `);
-}
+function renderRocks(filter=''){ const grid=$('rocks-grid'); const q=(filter!==undefined?filter:$('rock-search').value).trim(); const favs=getFavs(); let list=rocksData; if(rockType!=='همه') list=list.filter(r=>r.type===rockType); if(q) list=list.filter(r=>fuzzyMatch(r.name,q)||fuzzyMatch(r.type,q)||fuzzyMatch(r.subtype,q)); if(!list.length){ grid.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:30px;column-span:all">سنگی یافت نشد.</p>'; return; } grid.innerHTML=list.map((r,i)=>{ const isFav=favs.rocks.includes(r.name); return `<div class="card" style="animation-delay:${Math.min(i*.005,.4)}s" onclick="showRock('${r.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><div class="card-actions"><button class="action-btn ${isFav?'fav':''}" onclick="event.stopPropagation();toggleFav('rocks','${r.name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">${isFav?'★':'☆'}</button></div><h3>🪨 ${r.name}</h3><div class="card-meta"><span class="tag">${r.type}</span><span class="tag tag-cyan">${r.subtype}</span><span class="tag tag-pink">${r.texture}</span></div><p>${r.description}</p></div>`; }).join(''); applyTiltAll(grid); }
+function showRock(name){ const r=rocksData.find(x=>x.name===name); if(!r) return; const favs=getFavs(), isFav=favs.rocks.includes(name); openModal(`<h2>🪨 ${r.name}</h2><div class="modal-tools"><button onclick="toggleFav('rocks','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}');closeModal()">${isFav?'⭐ حذف':'☆ علاقه‌مندی'}</button><button onclick="addToCompare('rock','${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')">⚖️ مقایسه</button><button onclick="shareLink('rocks/${encodeURIComponent(name)}')">🔗 اشتراک</button><button onclick="window.print()">🖨️ چاپ</button></div><div class="detail-row"><span class="label">🏔️ نوع</span><span class="value">${r.type}</span></div><div class="detail-row"><span class="label">🔬 زیرگروه</span><span class="value">${r.subtype}</span></div><div class="detail-row"><span class="label">🧪 ترکیب</span><span class="value">${r.composition}</span></div><div class="detail-row"><span class="label">🔍 بافت</span><span class="value">${r.texture}</span></div><div class="detail-row"><span class="label">🎨 رنگ</span><span class="value">${r.color}</span></div><div class="detail-row"><span class="label">📍 محل</span><span class="value uses">${r.location}</span></div><div class="detail-row"><span class="label">🎯 کاربردها</span><span class="value uses"><div class="uses-list">${r.uses.map(u=>`<span class="use-tag">${u}</span>`).join('')}</div></span></div><p class="desc">${r.description}</p>`); }
 
-// ============ Hardness Scale ============
-function renderHardness(){
-  const data = [
-    {n:1, name:'تالک', desc:'نرم‌ترین کانی؛ با ناخن', icon:'🟢'},
-    {n:2, name:'گچ', desc:'با ناخن به سختی', icon:'⚪'},
-    {n:3, name:'کلسیت', desc:'با سکه مسی', icon:'🔵'},
-    {n:4, name:'فلوریت', desc:'با چاقو', icon:'🟣'},
-    {n:5, name:'آپاتیت', desc:'با چاقو به سختی', icon:'🟡'},
-    {n:6, name:'اورتوکلاز', desc:'با سوهان', icon:'🟠'},
-    {n:7, name:'کوارتز', desc:'شیشه را خط می‌اندازد', icon:'⚫'},
-    {n:8, name:'توپاز', desc:'سخت‌تر از کوارتز', icon:'🔶'},
-    {n:9, name:'کوراندوم', desc:'یاقوت و سفایر', icon:'🔴'},
-    {n:10, name:'الماس', desc:'سخت‌ترین ماده', icon:'💎'},
-  ];
-  const container = $('hardness-scale');
-  container.innerHTML = data.map(d=>`
-    <div class="sidebar-item" style="margin-bottom:10px;padding:16px 20px;font-size:1rem;background:var(--glass);border:1px solid var(--glass-border);" onclick="filterMineralsByHardness(${d.n})">
-      <span style="display:flex;align-items:center;gap:10px;">
-        <strong style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;">${d.n}</strong> 
-        <span>${d.icon} ${d.name}</span>
-      </span>
-      <span style="font-size:.85rem;color:var(--text-muted)">${d.desc}</span>
-    </div>
-  `).join('');
-}
-function filterMineralsByHardness(n){
-  mineralHardMin = Math.max(0, n - 0.5);
-  mineralHardMax = Math.min(10, n + 0.5);
-  mineralCat = 'همه';
-  mineralCountry = 'همه';
-  $('mineral-search').value = '';
-  document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
-  document.querySelector('.nav-btn[data-tab="minerals"]').classList.add('active');
-  $('minerals').classList.add('active');
-  renderMineralSidebar();
-  renderMinerals('');
-  toast(`کانی‌های با سختی ${n} نمایش داده شد`);
-}
+// تیلت
+function applyTiltAll(container){ container.querySelectorAll('.card').forEach(card=>{ card.addEventListener('mousemove',(e)=>{ if(readingMode) return; const rect=card.getBoundingClientRect(); const x=e.clientX-rect.left, y=e.clientY-rect.top; const rx=(y-rect.height/2)/rect.height*-8; const ry=(x-rect.width/2)/rect.width*8; card.style.transform=`perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`; }); card.addEventListener('mouseleave',()=>{ card.style.transform=''; }); }); }
 
-// ============ Rock Cycle ============
-function renderRockCycle(){
-  const wrap = $('rockcycle-wrap');
-  wrap.innerHTML = `
-    <svg class="rock-cycle-svg" viewBox="0 0 700 500">
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="var(--accent)"/>
-        </marker>
-      </defs>
-      <g class="cycle-node" onclick="enterApp('rocks')">
-        <circle cx="350" cy="80" r="55" fill="#f97316" opacity=".7"/>
-        <text x="350" y="85" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">ماگما</text>
-      </g>
-      <g class="cycle-node" onclick="enterApp('rocks')">
-        <circle cx="560" cy="200" r="60" fill="#ef4444" opacity=".7"/>
-        <text x="560" y="195" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">آذرین</text>
-        <text x="560" y="215" text-anchor="middle" fill="#fff" font-size="11">(بازالت/گرانیت)</text>
-      </g>
-      <g class="cycle-node" onclick="enterApp('rocks')">
-        <circle cx="500" cy="400" r="60" fill="#eab308" opacity=".7"/>
-        <text x="500" y="395" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">رسوبی</text>
-        <text x="500" y="415" text-anchor="middle" fill="#fff" font-size="11">(آهک/ماسه‌سنگ)</text>
-      </g>
-      <g class="cycle-node" onclick="enterApp('rocks')">
-        <circle cx="200" cy="400" r="60" fill="#8b5cf6" opacity=".7"/>
-        <text x="200" y="395" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">دگرگونی</text>
-        <text x="200" y="415" text-anchor="middle" fill="#fff" font-size="11">(مرمر/شیست)</text>
-      </g>
-      <g class="cycle-node" onclick="enterApp('rocks')">
-        <circle cx="140" cy="200" r="55" fill="#64748b" opacity=".7"/>
-        <text x="140" y="195" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">رسوب</text>
-        <text x="140" y="215" text-anchor="middle" fill="#fff" font-size="11">(خرده‌سنگ)</text>
-      </g>
-      <line x1="380" y1="115" x2="510" y2="170" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/>
-      <text x="455" y="135" font-size="10" fill="var(--text-muted)">سرد شدن</text>
-      <line x1="530" y1="255" x2="490" y2="345" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/>
-      <text x="525" y="305" font-size="10" fill="var(--text-muted)">هوازدگی</text>
-      <line x1="440" y1="420" x2="270" y2="420" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/>
-      <text x="350" y="445" font-size="10" fill="var(--text-muted)">گرما و فشار</text>
-      <line x1="160" y1="355" x2="150" y2="260" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/>
-      <text x="80" y="315" font-size="10" fill="var(--text-muted)">فرسایش</text>
-      <line x1="185" y1="175" x2="295" y2="115" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/>
-      <text x="215" y="135" font-size="10" fill="var(--text-muted)">ذوب</text>
-      <line x1="195" y1="380" x2="290" y2="120" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)" opacity=".6"/>
-      <line x1="280" y1="100" x2="500" y2="180" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)" opacity=".6"/>
-      <line x1="540" y1="245" x2="490" y2="345" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)" opacity=".6"/>
-    </svg>
-    <p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-top:12px;">روی هر بخش کلیک کنید تا سنگ‌های مرتبط را ببینید</p>
-  `;
-}
+// سختی
+function renderHardness(){ const data=[{n:1,name:'تالک',desc:'نرم‌ترین کانی',icon:'🟢'},{n:2,name:'گچ',desc:'با ناخن',icon:'⚪'},{n:3,name:'کلسیت',desc:'با سکه',icon:'🔵'},{n:4,name:'فلوریت',desc:'با چاقو',icon:'🟣'},{n:5,name:'آپاتیت',desc:'سخت‌تر',icon:'🟡'},{n:6,name:'اورتوکلاز',desc:'با سوهان',icon:'🟠'},{n:7,name:'کوارتز',desc:'شیشه را خط می‌زند',icon:'⚫'},{n:8,name:'توپاز',desc:'سخت‌تر',icon:'🔶'},{n:9,name:'کوراندوم',desc:'یاقوت و سفایر',icon:'🔴'},{n:10,name:'الماس',desc:'سخت‌ترین',icon:'💎'}]; const container=$('hardness-scale'); container.innerHTML=data.map(d=>`<div class="sidebar-item" style="margin-bottom:10px;padding:16px 20px;font-size:1rem;background:var(--glass-strong);border:1px solid var(--glass-border);backdrop-filter:blur(10px);" onclick="filterMineralsByHardness(${d.n})"><span style="display:flex;align-items:center;gap:10px;"><strong style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 4px 15px var(--accent-glow);">${d.n}</strong><span>${d.icon} ${d.name}</span></span><span style="font-size:.85rem;color:var(--text-muted)">${d.desc}</span></div>`).join(''); }
+function filterMineralsByHardness(n){ mineralHardMin=Math.max(0,n-.5); mineralHardMax=Math.min(10,n+.5); mineralCat='همه'; mineralCountry='همه'; $('mineral-search').value=''; document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active')); document.querySelector('.nav-btn[data-tab="minerals"]').classList.add('active'); $('minerals').classList.add('active'); renderMineralSidebar(); renderMinerals(''); toast(`کانی‌های با سختی ${n} نمایش داده شد`); }
 
-// ============ Timeline ============
-function renderTimeline(){
-  const track = $('timeline-track');
-  const historic = elementsData.filter(e=>e.year && !isNaN(parseInt(e.year)) && parseInt(e.year) > 1600 && parseInt(e.year) <= 2024);
-  const sorted = historic.sort((a,b)=>parseInt(a.year)-parseInt(b.year));
-  if(!sorted.length){ track.innerHTML = '<p style="text-align:center;color:var(--text-muted)">داده‌ای موجود نیست</p>'; return; }
-  const step = Math.max(1, Math.floor(sorted.length/25));
-  const selected = sorted.filter((_,i)=>i%step===0);
-  track.innerHTML = selected.map(el=>`
-    <div class="tl-point">
-      <div class="tl-dot" onclick="showElementBySymbol('${el.symbol}')" title="${el.name}"></div>
-      <div class="tl-year">${el.year}</div>
-      <div class="tl-name">${el.symbol}</div>
-    </div>
-  `).join('');
-}
+// چرخه سنگ
+function renderRockCycle(){ const wrap=$('rockcycle-wrap'); wrap.innerHTML=`<svg class="rock-cycle-svg" viewBox="0 0 700 500"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--accent)"/></marker></defs><g class="cycle-node" onclick="enterApp('rocks')"><circle cx="350" cy="80" r="55" fill="#f97316" opacity=".7"/><text x="350" y="85" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">ماگما</text></g><g class="cycle-node" onclick="enterApp('rocks')"><circle cx="560" cy="200" r="60" fill="#ef4444" opacity=".7"/><text x="560" y="195" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">آذرین</text></g><g class="cycle-node" onclick="enterApp('rocks')"><circle cx="500" cy="400" r="60" fill="#eab308" opacity=".7"/><text x="500" y="395" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">رسوبی</text></g><g class="cycle-node" onclick="enterApp('rocks')"><circle cx="200" cy="400" r="60" fill="#8b5cf6" opacity=".7"/><text x="200" y="395" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">دگرگونی</text></g><g class="cycle-node" onclick="enterApp('rocks')"><circle cx="140" cy="200" r="55" fill="#64748b" opacity=".7"/><text x="140" y="195" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">رسوب</text></g><line x1="380" y1="115" x2="510" y2="170" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/><line x1="530" y1="255" x2="490" y2="345" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/><line x1="440" y1="420" x2="270" y2="420" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/><line x1="160" y1="355" x2="150" y2="260" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/><line x1="185" y1="175" x2="295" y2="115" stroke="var(--accent)" stroke-width="3" marker-end="url(#arrow)"/></svg><p style="text-align:center;color:var(--text-muted);font-size:.85rem;margin-top:12px;">روی هر بخش کلیک کنید</p>`; }
 
-// ============ Favorites ============
-function renderFavorites(){
-  const favs = getFavs();
-  const grid = $('favorites-grid');
-  if(!favs.elements.length && !favs.minerals.length && !favs.rocks.length){
-    grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px">هنوز چیزی اضافه نکرده‌اید. با کلیک روی ⭐ در کارت‌ها اضافه کنید.</p>';
-    return;
-  }
-  let cards = '';
-  favs.elements.forEach(n=>{
-    const el = elementsData.find(e=>e.number===n);
-    if(el) cards += `<div class="card" onclick="showElementBySymbol('${el.symbol}')"><h3>⚛️ ${el.name} (${el.symbol})</h3><div class="card-meta"><span class="tag">عدد ${el.number}</span><span class="tag tag-cyan">${el.category}</span></div><p>${el.summary}</p></div>`;
-  });
-  favs.minerals.forEach(name=>{
-    const m = mineralsData.find(x=>x.name===name);
-    if(m) cards += `<div class="card" onclick="showMineral('${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><h3>💎 ${m.name}</h3><div class="card-meta"><span class="tag">${m.formula}</span><span class="tag tag-cyan">${m.category}</span></div><p>${m.description}</p></div>`;
-  });
-  favs.rocks.forEach(name=>{
-    const r = rocksData.find(x=>x.name===name);
-    if(r) cards += `<div class="card" onclick="showRock('${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><h3>🪨 ${r.name}</h3><div class="card-meta"><span class="tag">${r.type}</span><span class="tag tag-cyan">${r.subtype}</span></div><p>${r.description}</p></div>`;
-  });
-  grid.innerHTML = cards;
-}
+// تایم‌لاین
+function renderTimeline(){ const track=$('timeline-track'); const historic=elementsData.filter(e=>e.year && !isNaN(parseInt(e.year)) && parseInt(e.year)>1600 && parseInt(e.year)<=2024); const sorted=historic.sort((a,b)=>parseInt(a.year)-parseInt(b.year)); if(!sorted.length){ track.innerHTML='<p style="text-align:center;color:var(--text-muted)">داده‌ای موجود نیست</p>'; return; } const step=Math.max(1,Math.floor(sorted.length/25)); const selected=sorted.filter((_,i)=>i%step===0); track.innerHTML=selected.map(el=>`<div class="tl-point"><div class="tl-dot" onclick="showElementBySymbol('${el.symbol}')" title="${el.name}"></div><div class="tl-year">${el.year}</div><div class="tl-name">${el.symbol}</div></div>`).join(''); }
 
-// ============ Compare ============
-let compareItems = [];
-function addToCompare(type, id){
-  if(compareItems.find(x=>x.type===type && x.id===id)){ toast('قبلاً اضافه شده'); return; }
-  if(compareItems.length >= 2){ toast('حداکثر ۲ آیتم'); return; }
-  if(compareItems.length === 1 && compareItems[0].type !== type){
-    toast('فقط آیتم‌های هم‌نوع قابل مقایسه‌اند'); return;
-  }
-  compareItems.push({type, id});
-  updateCompareBar();
-  playClick();
-  toast(`اضافه شد (${compareItems.length}/2)`);
-}
-function updateCompareBar(){
-  const bar = $('compare-bar');
-  if(!compareItems.length){ bar.classList.remove('show'); return; }
-  bar.classList.add('show');
-  $('compare-items').innerHTML = compareItems.map((it,i)=>{
-    let label = '';
-    if(it.type==='element'){ const e=elementsData.find(x=>x.number===it.id); label=e?e.name:'?'; }
-    else label = it.id;
-    return `<span class="item-preview">${label} <span class="x" onclick="removeCompareItem(${i})">✕</span></span>`;
-  }).join('');
-  $('do-compare').disabled = compareItems.length !== 2;
-}
+// علاقه‌مندی
+function renderFavorites(){ const favs=getFavs(), grid=$('favorites-grid'); if(!favs.elements.length && !favs.minerals.length && !favs.rocks.length){ grid.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:40px;column-span:all">هنوز چیزی اضافه نکرده‌اید. با کلیک روی ⭐ در کارت‌ها اضافه کنید.</p>'; return; } let cards=''; favs.elements.forEach(n=>{ const el=elementsData.find(e=>e.number===n); if(el) cards+=`<div class="card" onclick="showElementBySymbol('${el.symbol}')"><h3>⚛️ ${el.name}</h3><div class="card-meta"><span class="tag">عدد ${el.number}</span><span class="tag tag-cyan">${el.category}</span></div><p>${el.summary}</p></div>`; }); favs.minerals.forEach(name=>{ const m=mineralsData.find(x=>x.name===name); if(m) cards+=`<div class="card" onclick="showMineral('${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><h3>💎 ${m.name}</h3><div class="card-meta"><span class="tag">${m.formula}</span><span class="tag tag-cyan">${m.category}</span></div><p>${m.description}</p></div>`; }); favs.rocks.forEach(name=>{ const r=rocksData.find(x=>x.name===name); if(r) cards+=`<div class="card" onclick="showRock('${name.replace(/'/g,"\\\\'").replace(/"/g,'&quot;')}')"><h3>🪨 ${r.name}</h3><div class="card-meta"><span class="tag">${r.type}</span><span class="tag tag-cyan">${r.subtype}</span></div><p>${r.description}</p></div>`; }); grid.innerHTML=cards; applyTiltAll(grid); }
+
+// مقایسه
+let compareItems=[];
+function addToCompare(type,id){ if(compareItems.find(x=>x.type===type && x.id===id)){ toast('قبلاً اضافه شده'); return; } if(compareItems.length>=2){ toast('حداکثر ۲ آیتم'); return; } if(compareItems.length===1 && compareItems[0].type!==type){ toast('فقط هم‌نوع قابل مقایسه‌اند'); return; } compareItems.push({type,id}); updateCompareBar(); playClick(); toast(`اضافه شد (${compareItems.length}/2)`); }
+function updateCompareBar(){ const bar=$('compare-bar'); if(!compareItems.length){ bar.classList.remove('show'); return; } bar.classList.add('show'); $('compare-items').innerHTML=compareItems.map((it,i)=>{ let label=it.type==='element'?(elementsData.find(x=>x.number===it.id)?.name||'?'):it.id; return `<span class="item-preview">${label} <span class="x" onclick="removeCompareItem(${i})">✕</span></span>`; }).join(''); $('do-compare').disabled=compareItems.length!==2; }
 function removeCompareItem(i){ compareItems.splice(i,1); updateCompareBar(); }
 function clearCompare(){ compareItems=[]; updateCompareBar(); }
-$('do-compare').addEventListener('click', ()=>{
-  if(compareItems.length !== 2) return;
-  const [a, b] = compareItems;
-  let fields, A, B;
-  if(a.type === 'element'){
-    A = elementsData.find(x=>x.number===a.id); B = elementsData.find(x=>x.number===b.id);
-    fields = [['عدد','number'],['جرم','mass'],['دسته','category'],['دوره','period'],['گروه','group'],['الکترونگاتیوی','en'],['شعاع','radius'],['ذوب','melting'],['چگالی','density'],['کاشف','discoverer'],['سال','year']];
-  } else if(a.type === 'mineral'){
-    A = mineralsData.find(x=>x.name===a.id); B = mineralsData.find(x=>x.name===b.id);
-    fields = [['فرمول','formula'],['رده','category'],['سختی','hardness'],['رنگ','color'],['قیمت','price'],['کمیابی','rarity']];
-  } else {
-    A = rocksData.find(x=>x.name===a.id); B = rocksData.find(x=>x.name===b.id);
-    fields = [['نوع','type'],['زیرگروه','subtype'],['ترکیب','composition'],['بافت','texture'],['رنگ','color']];
-  }
-  openModal(`
-    <h2>⚖️ مقایسه</h2>
-    <div class="compare-grid">
-      <div class="compare-col"><h3>${A.name}</h3>${fields.map(f=>`<div class="detail-row"><span class="label">${f[0]}</span><span class="value">${A[f[1]]||'-'}</span></div>`).join('')}</div>
-      <div class="compare-col"><h3>${B.name}</h3>${fields.map(f=>`<div class="detail-row"><span class="label">${f[0]}</span><span class="value">${B[f[1]]||'-'}</span></div>`).join('')}</div>
-    </div>
-    <div class="modal-tools" style="margin-top:16px"><button onclick="clearCompare();closeModal()">پاک‌سازی</button></div>
-  `);
-});
+$('do-compare').addEventListener('click',()=>{ if(compareItems.length!==2) return; const [a,b]=compareItems; let fields,A,B; if(a.type==='element'){ A=elementsData.find(x=>x.number===a.id); B=elementsData.find(x=>x.number===b.id); fields=[['عدد','number'],['جرم','mass'],['دسته','category'],['الکترونگاتیوی','en'],['کاشف','discoverer'],['سال','year']]; } else if(a.type==='mineral'){ A=mineralsData.find(x=>x.name===a.id); B=mineralsData.find(x=>x.name===b.id); fields=[['فرمول','formula'],['رده','category'],['سختی','hardness'],['قیمت','price']]; } else { A=rocksData.find(x=>x.name===a.id); B=rocksData.find(x=>x.name===b.id); fields=[['نوع','type'],['زیرگروه','subtype'],['بافت','texture'],['رنگ','color']]; } openModal(`<h2>⚖️ مقایسه</h2><div class="compare-grid"><div class="compare-col"><h3>${A.name}</h3>${fields.map(f=>`<div class="detail-row"><span class="label">${f[0]}</span><span class="value">${A[f[1]]||'-'}</span></div>`).join('')}</div><div class="compare-col"><h3>${B.name}</h3>${fields.map(f=>`<div class="detail-row"><span class="label">${f[0]}</span><span class="value">${B[f[1]]||'-'}</span></div>`).join('')}</div></div><div class="modal-tools" style="margin-top:16px"><button onclick="clearCompare();closeModal()">پاک‌سازی</button></div>`); });
 
-// ============ Share ============
-function shareLink(path){
-  const url = location.origin + location.pathname + '#' + path;
-  if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('لینک کپی شد')).catch(()=>prompt('لینک:', url));
-  else prompt('لینک:', url);
-}
+// اشتراک
+function shareLink(path){ const url=location.origin+location.pathname+'#'+path; if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('لینک کپی شد')).catch(()=>prompt('لینک:',url)); else prompt('لینک:',url); }
+function openFromHash(){ const h=location.hash.replace('#',''); if(!h) return; const [type,id]=h.split('/'); if(type==='elements'){ const el=elementsData.find(e=>e.symbol===id); if(el){ enterApp('periodic'); setTimeout(()=>showElement(el),300); } } else if(type==='minerals'){ const name=decodeURIComponent(id); if(mineralsData.find(m=>m.name===name)){ enterApp('minerals'); setTimeout(()=>showMineral(name),300); } } else if(type==='rocks'){ const name=decodeURIComponent(id); if(rocksData.find(r=>r.name===name)){ enterApp('rocks'); setTimeout(()=>showRock(name),300); } } }
 
-// ============ Direct link ============
-function openFromHash(){
-  const h = location.hash.replace('#','');
-  if(!h) return;
-  const [type, id] = h.split('/');
-  if(type === 'elements'){
-    const el = elementsData.find(e=>e.symbol===id);
-    if(el){ enterApp('periodic'); setTimeout(()=>showElement(el), 300); }
-  } else if(type === 'minerals'){
-    const name = decodeURIComponent(id);
-    if(mineralsData.find(m=>m.name===name)){ enterApp('minerals'); setTimeout(()=>showMineral(name), 300); }
-  } else if(type === 'rocks'){
-    const name = decodeURIComponent(id);
-    if(rocksData.find(r=>r.name===name)){ enterApp('rocks'); setTimeout(()=>showRock(name), 300); }
-  }
-}
+// جستجو
+$('element-search').addEventListener('input',e=>renderPeriodicTable(e.target.value));
+$('element-search').addEventListener('change',e=>addHist('element',e.target.value));
+$('mineral-search').addEventListener('input',e=>renderMinerals(e.target.value));
+$('mineral-search').addEventListener('change',e=>addHist('mineral',e.target.value));
+$('rock-search').addEventListener('input',e=>renderRocks(e.target.value));
+$('rock-search').addEventListener('change',e=>addHist('rock',e.target.value));
+setupVoice('mic-element','element-search','element'); setupVoice('mic-mineral','mineral-search','mineral'); setupVoice('mic-rock','rock-search','rock');
 
-// ============ Search bindings ============
-$('element-search').addEventListener('input', e=>renderPeriodicTable(e.target.value));
-$('element-search').addEventListener('change', e=>addHist('element', e.target.value));
-$('mineral-search').addEventListener('input', e=>renderMinerals(e.target.value));
-$('mineral-search').addEventListener('change', e=>addHist('mineral', e.target.value));
-$('rock-search').addEventListener('input', e=>renderRocks(e.target.value));
-$('rock-search').addEventListener('change', e=>addHist('rock', e.target.value));
+document.addEventListener('keydown',e=>{ if(e.key==='/' && !['INPUT','TEXTAREA'].includes(e.target.tagName) && $('landing').classList.contains('hidden')){ e.preventDefault(); const active=document.querySelector('.tab-content.active'); if(active){ const inp=active.querySelector('input'); if(inp) inp.focus(); } } });
 
-setupVoice('mic-element','element-search','element');
-setupVoice('mic-mineral','mineral-search','mineral');
-setupVoice('mic-rock','rock-search','rock');
-
-document.addEventListener('keydown', e=>{
-  if(e.key === '/' && !['INPUT','TEXTAREA'].includes(e.target.tagName) && $('landing').classList.contains('hidden')){
-    e.preventDefault();
-    const active = document.querySelector('.tab-content.active');
-    if(active){ const inp = active.querySelector('input'); if(inp) inp.focus(); }
-  }
-});
-
-// ============ Init ============
+// راه‌اندازی
 renderPeriodicTable();
 renderMineralSidebar(); renderMinerals();
 renderRockSidebar(); renderRocks();
@@ -2174,7 +1371,7 @@ def index():
 def manifest():
     return Response(json.dumps({
         "name":"اطلس زمین‌شناسی | مهراد ترابی","short_name":"اطلس زمین",
-        "description":"جدول مندلیف، کانی‌ها و سنگ‌ها — اثر مهراد ترابی",
+        "description":"جدول مندلیف، کانی‌ها و سنگ‌ها",
         "start_url":"/","display":"standalone","background_color":"#0f0c29",
         "theme_color":"#8b5cf6","lang":"fa","dir":"rtl",
         "icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
@@ -2183,27 +1380,15 @@ def manifest():
 @app.route('/sw.js')
 def sw():
     return Response("""
-const CACHE='atlas-v4';
+const CACHE='atlas-v7';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/','/manifest.json','/icon.svg'])).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET') return;
-  e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{
-    if(r.ok&&e.request.url.startsWith(self.location.origin)){const cp=r.clone();caches.open(CACHE).then(x=>x.put(e.request,cp))}
-    return r;
-  }).catch(()=>caches.match('/'))));
-});
+self.addEventListener('fetch',e=>{ if(e.request.method!=='GET') return; e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{ if(r.ok&&e.request.url.startsWith(self.location.origin)){const cp=r.clone();caches.open(CACHE).then(x=>x.put(e.request,cp))} return r; }).catch(()=>caches.match('/')))); });
 """, mimetype='application/javascript')
 
 @app.route('/icon.svg')
 def icon():
-    return Response('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" fill="#1e1b4b" rx="100"/>
-<circle cx="256" cy="256" r="40" fill="#a78bfa"/>
-<ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#06b6d4" stroke-width="8"/>
-<ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#ec4899" stroke-width="8" transform="rotate(60 256 256)"/>
-<ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#f59e0b" stroke-width="8" transform="rotate(-60 256 256)"/>
-</svg>''', mimetype='image/svg+xml')
+    return Response('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1e1b4b" rx="100"/><circle cx="256" cy="256" r="40" fill="#a78bfa"/><ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#06b6d4" stroke-width="8"/><ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#ec4899" stroke-width="8" transform="rotate(60 256 256)"/><ellipse cx="256" cy="256" rx="180" ry="70" fill="none" stroke="#f59e0b" stroke-width="8" transform="rotate(-60 256 256)"/></svg>''', mimetype='image/svg+xml')
 
 if __name__ == '__main__':
     print(f"عناصر: {len(elements)} | کانی‌ها: {len(minerals)} | سنگ‌ها: {len(rocks)}")
