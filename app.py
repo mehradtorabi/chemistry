@@ -895,7 +895,8 @@ main{padding:20px 16px;max-width:1440px;margin:0 auto;position:relative;z-index:
 
 /* جدول مندلیف */
 .periodic-grid{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;overflow-x:auto;padding-bottom:10px}
-.element-cell{aspect-ratio:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;cursor:pointer;transition:var(--transition);backdrop-filter:blur(8px);position:relative;min-width:46px}
+.element-cell{aspect-ratio:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;cursor:pointer;transition:transform .15s ease-out,border-color .15s ease-out;position:relative;min-width:46px;contain:layout style paint}
+.element-cell:hover{transform:scale(1.1);z-index:10;border-color:var(--accent)}
 .element-cell:hover{transform:scale(1.14);z-index:10;box-shadow:0 0 20px var(--accent-glow);border-color:var(--accent)}
 .element-number{font-size:.55rem;color:var(--text-muted);position:absolute;top:2px;right:4px}
 .element-symbol{font-size:1rem;font-weight:700}
@@ -1597,35 +1598,51 @@ function setupVoice(btnId, inputId, type){
 }
 
 // ============ Periodic table ============
+// ============ Periodic table (Optimized) ============
 function renderPeriodicTable(filter=''){
   const mainGrid = $('periodic-main'), lanthGrid = $('periodic-lanth');
-  mainGrid.innerHTML=''; lanthGrid.innerHTML='';
   const q = filter.trim();
   const lanth = elementsData.filter(e=>e.category==='لانتانید');
   const act = elementsData.filter(e=>e.category==='اکتینید');
   const main = elementsData.filter(e=>e.category!=='لانتانید'&&e.category!=='اکتینید');
-  const cells = [];
-  for(let p=1;p<=7;p++) for(let g=1;g<=18;g++) cells.push({p,g});
-  cells.forEach(c=>{
-    const el = main.find(e=>e.group===c.g&&e.period===c.p);
-    const div = document.createElement('div'); div.className='element-cell';
-    if(el){
-      if(q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q) && !String(el.number).includes(q))
-        div.style.opacity='.12';
-      div.classList.add('blk-'+el.block);
-      div.innerHTML = `<span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span>`;
-      div.addEventListener('click', ()=>showElement(el));
-    } else div.style.opacity='.06';
-    mainGrid.appendChild(div);
+  
+  // ساخت نقشه برای جستجوی سریع به جای حلقه find
+  const mainMap = {};
+  main.forEach(el => { mainMap[`${el.period}-${el.group}`] = el; });
+  
+  let mainHtml = '';
+  for(let p=1;p<=7;p++){
+    for(let g=1;g<=18;g++){
+      const el = mainMap[`${p}-${g}`];
+      if(el){
+        const dim = q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q) && !String(el.number).includes(q);
+        mainHtml += `<div class="element-cell blk-${el.block}" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`;
+      } else {
+        mainHtml += `<div class="element-cell" style="opacity:.06"></div>`;
+      }
+    }
+  }
+  mainGrid.innerHTML = mainHtml;
+  
+  let lanthHtml = '';
+  lanth.concat(act).forEach(el => {
+    const dim = q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q);
+    lanthHtml += `<div class="element-cell blk-f" data-num="${el.number}" style="${dim?'opacity:.12':''}"><span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span></div>`;
   });
-  lanth.concat(act).forEach(el=>{
-    const div = document.createElement('div'); div.className='element-cell blk-f';
-    if(q && !fuzzyMatch(el.name,q) && !fuzzyMatch(el.symbol,q)) div.style.opacity='.12';
-    div.innerHTML = `<span class="element-number">${el.number}</span><span class="element-symbol">${el.symbol}</span><span class="element-name">${el.name}</span>`;
-    div.addEventListener('click', ()=>showElement(el));
-    lanthGrid.appendChild(div);
-  });
+  lanthGrid.innerHTML = lanthHtml;
 }
+
+// Event Delegation - تعریف فقط یک بار در بیرون از تابع (باید در اسکریپت قرار بگیرد)
+(function setupPeriodicDelegation() {
+  const handler = (e) => {
+    const cell = e.target.closest('.element-cell');
+    if (!cell || !cell.dataset.num) return;
+    const el = elementsData.find(x => x.number === parseInt(cell.dataset.num));
+    if (el) showElement(el);
+  };
+  document.getElementById('periodic-main').addEventListener('click', handler);
+  document.getElementById('periodic-lanth').addEventListener('click', handler);
+})();
 
 function atomicSVG(el){
   const Z = el.number, A = Math.round(el.mass);
